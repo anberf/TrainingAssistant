@@ -36,7 +36,7 @@ AC:
 - Tests with fake clock: auto-advances through all steps with zero input; countdown uses time deltas (one big tick jump crosses steps correctly); pause/resume preserves remaining; skip; back rule (> 3 s restarts, else previous; at step 0 restarts); skip/back while paused stay paused; beeps fire exactly once each at 3,2,1 and final at 0; no beeps while paused; `finished` with total elapsed.
 
 ### T05 — Key mapping (pure)
-Status: todo
+Status: done
 - `js/keys.js`: `mapKey(keyOrCode, screen) -> 'start'|'toggle'|'skip'|'back'|'up'|'down'|null` per SPEC §5 table. Screens: `picker`, `run`, `done`.
 AC:
 - Tests for every row/column in SPEC §5 incl. media keys; unmapped keys → null; no exit/menu action exists during a run.

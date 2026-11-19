@@ -9,3 +9,4 @@ Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, r
 - T02: js/routine.js — validateRoutine, stepDuration, expand, totalDuration (schema v2) + tests.
 - T03: routines/index.json + routines/demo.json + registry test (all routine files valid and listed).
 - T04: js/engine.js — pure timer state machine (ready, auto-advance, pause, skip, back, beep/final-beep/finished events) + fake-clock tests.
+- T05: js/keys.js — pure mapKey(key, screen) per SPEC §5 + tests.
