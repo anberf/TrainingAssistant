@@ -60,11 +60,11 @@ Offline kettlebell workout timer. Runs on a phone (PWA) and is mirrored/cast to 
 - **Picker screen**: list of routines (name, weight, total duration from expansion). Tap a routine (or arrows + Enter) = **Start**. Start also enters fullscreen, acquires wake lock, unlocks audio.
 - **Get-ready**: 5 s countdown before step 1 (shows step 1 as "next up" with its cues).
 - **Every step is timed** and auto-advances at 0. Nothing waits for input (D04 superseded by D11).
-- **Display during a step**: step name, type badge (EXERCISE / REST), big countdown `m:ss`/`ss`, for reps steps a target label `×10` or `×10 / side` next to the countdown, block name + `round r/n`, step index `n / total`, "NEXT UP: <name>".
+- **Display during a step**: step name, type badge (EXERCISE / REST), big countdown `m:ss`/`ss`, for reps exercise steps a target label `×10` or `×10 / side` next to the countdown (never next to a rest/get-ready countdown — there the target appears only in the "Next:" line), block name + `round r/n`, step index `n / total`, "NEXT UP: <name>".
 - **Cues**: current exercise shows its 3 cues; during a pause the screen prominently shows the NEXT exercise's name, target, and its 3 cues (+ clip if any).
 - **Beeps** (WebAudio, generated tones, no audio files): short beep at 3, 2, 1 s remaining of every step; distinct longer/higher tone at 0. No beeps while paused.
 - **Paused**: countdown frozen, large "PAUSED" overlay.
-- **End screen**: "Done" + total elapsed time + one button "Back to routines".
+- **End screen**: "Done" + total elapsed time as `m:ss` (or `h:mm:ss` ≥ 1 h) + one button "Back to routines".
 
 ## 5. Controls
 The ONLY user controls: **Start** (once, picker), **Pause/Resume**, **Skip**, **Back**.
@@ -85,7 +85,7 @@ The ONLY user controls: **Start** (once, picker), **Pause/Resume**, **Skip**, **
 - Fullscreen entered on Start (Fullscreen API); silently skipped if unsupported.
 - Landscape layout (16:9) primary; portrait phone layout must still be usable.
 - High contrast: near-black background, white text, one accent color per step type (exercise vs rest); main text contrast ≥ 7:1.
-- Sizes in viewport units: countdown ≥ 30vh tall; step name ≥ 8vh; cues ≥ 5vh. Readable at 3 m on a 40" TV. Long names/cues must not overflow (shrink or ellipsis).
+- Sizes in viewport units: countdown ≥ 30vh tall; step name ≥ 8vh; cues ≥ 5vh; "Next:" line during rest/get-ready ≥ 7vh; status line (badge, block/round, index) ≥ 4.5vh; "NEXT UP" ≥ 5vh. Readable at 3 m on a 40" TV. Long names/cues must not overflow (shrink or ellipsis).
 - Screen Wake Lock while a routine runs; re-acquire on `visibilitychange`; silently degrade if unsupported.
 - Optional clip: `<video muted loop playsinline autoplay>` from local path; missing/failed clip → hide video, no error.
 

@@ -103,3 +103,28 @@ Status: done
 AC:
 - Contrast of main text/background tokens ≥ 7:1 (test computes from CSS tokens).
 - E2E simulation test passes.
+
+### T15 — Rest screen target + TV-readable secondary text
+Status: todo
+- During rest/get-ready, the big countdown has NO target beside it; the next exercise's target shows only in the "Next: <name> ×N" line, which is enlarged. Enlarge status line and "NEXT UP" per SPEC §4/§6.
+- Found in browser check: rest showed "13 ×10" (target looked like part of the rest); status line was 3vh, NEXT UP 3.5vh.
+AC:
+- View-model test: for a pause or get-ready state the countdown-side target is empty and the next exercise's target is exposed separately (e.g. `nextTarget`); exercise steps unchanged.
+- CSS test (from tokens/rules): "Next:" line ≥ 7vh, status line ≥ 4.5vh, NEXT UP ≥ 5vh; existing countdown/name/cue minimums still hold.
+- Portrait phone (375×812) still fits without overlapping the control bar (state checked in self-audit).
+
+### T16 — End screen total time format
+Status: todo
+- Total time on the end screen shows `m:ss` (`0:58`, `58:51`), `h:mm:ss` from 1 h (`1:02:03`). Found in browser check: showed "Total time 1".
+AC:
+- Pure `formatTotal(sec)` (in `view.js`) tested for 0, 58, 60, 3531, 3723 s; end screen uses it (static test or view-model test).
+
+### T17 — Cleanup + release v2
+Status: todo
+- `routines/demo.json`: drop `"weight": "none"`; picker card omits the weight part when a routine has no weight (shows only duration).
+- Delete `docs/routine-drafts/` (superseded by `routines/kb-60-core-full-body.json`).
+- Release: bump `CACHE_VERSION` in `sw.js` to `"v2"`, rename CHANGELOG `## Unreleased` to `## v2 (<date>)` and add a fresh empty `## Unreleased` above it.
+AC:
+- Test: picker card label for a routine without weight has no "none"/empty separator (pure helper tested).
+- `docs/routine-drafts/` no longer exists; nothing references it except history in QUESTIONS/BACKLOG.
+- Release test (T12) passes with v2.
