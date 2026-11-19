@@ -34,6 +34,17 @@ test('SPEC 6 size tokens: countdown >= 30vh, title >= 8vh, cue >= 5vh', () => {
   assert.ok(vh('cue') >= 5);
 });
 
+test('T15 SPEC 6: Next line >= 7vh, status line >= 4.5vh, NEXT UP >= 5vh', () => {
+  const size = (sel) => {
+    const i = css.indexOf(sel + ' {');
+    assert.ok(i >= 0, sel);
+    return parseFloat(css.slice(i, css.indexOf('}', i)).match(/font-size:\s*([0-9.]+)vh/)[1]);
+  };
+  assert.ok(size('#run-focus') >= 7);
+  assert.ok(size('#run-meta') >= 4.5);
+  assert.ok(size('#run-next') >= 5);
+});
+
 test('long text on run screen is ellipsized', () => {
   ['#run-title', '#run-cues li', '#run-next', '#run-focus'].forEach((sel) => {
     const i = css.indexOf(sel + ' {');

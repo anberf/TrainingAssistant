@@ -32,10 +32,20 @@ test('pause shows NEXT exercise name, target, cues, clip', () => {
   assert.strictEqual(v.theme, 'rest');
   assert.strictEqual(v.cuesFor, 'next');
   assert.strictEqual(v.focusName, 'Halo');
-  assert.strictEqual(v.target, '×10 / side');
+  assert.strictEqual(v.target, '');
+  assert.strictEqual(v.nextTarget, '×10 / side');
   assert.deepStrictEqual(v.cues, cues('h'));
   assert.strictEqual(v.clip, 'clips/halo.mp4');
   assert.strictEqual(v.nextUp, 'Halo');
+});
+test('get-ready: no countdown-side target; next target exposed separately', () => {
+  const v = toView({ phase: 'ready', paused: false, total: 4, step: null, next: steps[2], remainingSec: 5 });
+  assert.strictEqual(v.target, '');
+  assert.strictEqual(v.nextTarget, '×10 / side');
+  assert.strictEqual(v.focusName, 'Halo');
+});
+test('exercise step has no nextTarget', () => {
+  assert.strictEqual(toView(at(0)).nextTarget, '');
 });
 test('seconds steps have no target; exercise without clip has empty clip', () => {
   const v = toView(at(3));

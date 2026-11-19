@@ -171,7 +171,7 @@
     setText('run-block', v.blockLabel);
     setText('run-index', v.index);
     setText('run-next', v.nextUp ? 'NEXT UP: ' + v.nextUp : '');
-    setText('run-focus', v.cuesFor === 'next' && v.focusName ? 'Next: ' + v.focusName + (v.target ? ' ' + v.target : '') : '');
+    setText('run-focus', v.cuesFor === 'next' && v.focusName ? 'Next: ' + v.focusName + (v.nextTarget ? ' ' + v.nextTarget : '') : '');
     renderCues(v.cues);
     renderClip(v.clip);
     setText('btn-toggle-label', v.paused ? 'Resume' : 'Pause');

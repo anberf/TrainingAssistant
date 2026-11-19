@@ -25,7 +25,7 @@
   function toView(state) {
     var v = {
       title: '', badge: '', countdown: '', target: '', blockLabel: '', index: '',
-      nextUp: '', cues: [], cuesFor: 'current', clip: '', theme: 'idle',
+      nextUp: '', nextTarget: '', cues: [], cuesFor: 'current', clip: '', theme: 'idle',
       paused: !!(state && state.paused), focusName: ''
     };
     if (!state) return v;
@@ -39,7 +39,7 @@
       v.index = '0 / ' + state.total;
       v.cuesFor = 'next';
       if (next) {
-        v.focusName = next.name; v.target = targetLabel(next); v.cues = (next.cues || []).slice();
+        v.focusName = next.name; v.nextTarget = targetLabel(next); v.cues = (next.cues || []).slice();
         v.clip = next.clip || ''; v.nextUp = next.name; v.blockLabel = blockLabel(next);
       }
     } else if (state.phase === 'step' && step) {
@@ -54,7 +54,9 @@
       v.nextUp = next ? next.name : 'Finish';
       v.cuesFor = isPause ? 'next' : 'current';
       if (focus) {
-        v.focusName = focus.name; v.target = targetLabel(focus); v.cues = (focus.cues || []).slice();
+        v.focusName = focus.name; v.cues = (focus.cues || []).slice();
+        // Rest: target belongs to the NEXT exercise, never beside the rest countdown.
+        if (isPause) v.nextTarget = targetLabel(focus); else v.target = targetLabel(focus);
         v.clip = focus.clip || '';
       }
     } else if (state.phase === 'finished') {

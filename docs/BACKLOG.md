@@ -105,7 +105,7 @@ AC:
 - E2E simulation test passes.
 
 ### T15 — Rest screen target + TV-readable secondary text
-Status: todo
+Status: done
 - During rest/get-ready, the big countdown has NO target beside it; the next exercise's target shows only in the "Next: <name> ×N" line, which is enlarged. Enlarge status line and "NEXT UP" per SPEC §4/§6.
 - Found in browser check: rest showed "13 ×10" (target looked like part of the rest); status line was 3vh, NEXT UP 3.5vh.
 AC:
