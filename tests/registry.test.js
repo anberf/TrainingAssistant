@@ -30,6 +30,21 @@ test('every routine file is valid', () => {
   });
 });
 
+test('KB 60 routine: valid, listed, 3531 s, 78 steps, block order', () => {
+  assert.ok(listed.includes('kb-60-core-full-body.json'), 'kb-60-core-full-body.json not listed');
+  const kb = JSON.parse(fs.readFileSync(path.join(dir, 'kb-60-core-full-body.json'), 'utf8'));
+  const v = R.validateRoutine(kb);
+  assert.ok(v.ok, v.errors.join('; '));
+  assert.strictEqual(R.totalDuration(kb), 3531);
+  const flat = R.expand(kb);
+  assert.strictEqual(flat.length, 78);
+  assert.strictEqual(flat.reduce((a, s) => a + s.durationSec, 0), 3531);
+  assert.deepStrictEqual(kb.blocks.map((b) => b.name), ['Warm-up', 'Block A', 'Transition', 'Block B', 'Cool-down']);
+  const seen = [];
+  flat.forEach((s) => { if (seen[seen.length - 1] !== s.block) seen.push(s.block); });
+  assert.deepStrictEqual(seen, ['Warm-up', 'Block A', 'Transition', 'Block B', 'Cool-down']);
+});
+
 test('demo routine shape and durations', () => {
   const demo = JSON.parse(fs.readFileSync(path.join(dir, 'demo.json'), 'utf8'));
   assert.strictEqual(demo.blocks.length, 1);

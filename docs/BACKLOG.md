@@ -90,7 +90,7 @@ AC:
 - Test fails if CHANGELOG version and `CACHE_VERSION` differ.
 
 ### T13 — First real routine: KB 60 min core + full body
-Status: todo
+Status: done
 - Move `docs/routine-drafts/kb-60-core-full-body.json` (content approved by user, Q01) to `routines/`, register in `routines/index.json`. Fix only schema issues; do not change exercises, reps, timings, or cues without a QUESTIONS entry.
 AC:
 - Validates with T02; listed in index; T03 registry test passes.
