@@ -63,7 +63,7 @@ AC:
 - Tests with a mock AudioContext: correct frequencies/durations scheduled; no throw when AudioContext missing.
 
 ### T09 — Fullscreen + Wake Lock
-Status: todo
+Status: done
 - `js/screen.js`: enter fullscreen on Start; wake lock acquire on Start, release on finish, re-acquire on `visibilitychange`.
 AC:
 - Tests with mocked `document`/`navigator`: acquire/release/re-acquire calls; graceful when APIs absent.

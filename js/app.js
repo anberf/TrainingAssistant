@@ -9,6 +9,7 @@
   var entries = [];   // { file, name, routine, ok, error, total }
   var selected = 0;
   var cache = {};
+  var screenCtl = ScreenCtl.create(document, navigator);
   var beeper = Audio2.createBeeper(window.AudioContext || window.webkitAudioContext);
 
   function setText(id, text) {
@@ -101,6 +102,7 @@
     var e = entries[i];
     if (!e || !e.ok) return;
     beeper.unlock();
+    screenCtl.start();
     engine = Engine.create(Routine.expand(e.routine), { onEvent: beeper.onEvent });
     cache = {};
     showScreen('run');
@@ -135,6 +137,7 @@
     var state = engine.getState();
     if (state.phase === 'finished') {
       cancelAnimationFrame(rafId);
+      screenCtl.finish();
       $('done-elapsed').textContent = 'Total time ' + View.formatCountdown(Math.round(state.totalElapsedMs / 1000));
       showScreen('done');
       return;
@@ -173,6 +176,7 @@
 
   function goHome() {
     engine = null;
+    screenCtl.finish();
     cancelAnimationFrame(rafId);
     showScreen('picker');
     renderPicker();
