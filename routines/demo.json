@@ -2,7 +2,6 @@
   "id": "demo",
   "name": "Demo",
   "description": "Short test routine",
-  "weight": "none",
   "defaults": { "secPerRep": 2 },
   "blocks": [
     {

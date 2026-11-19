@@ -27,11 +27,6 @@
     if (name !== 'run') app.setAttribute('data-theme', name === 'done' ? 'done' : 'idle');
   }
 
-  function fmtDuration(sec) {
-    var m = Math.round(sec / 60);
-    return m < 1 ? sec + ' s' : m + ' min';
-  }
-
   function renderPicker() {
     var ul = $('routine-list');
     ul.textContent = '';
@@ -47,7 +42,7 @@
       var sub = document.createElement('span');
       sub.className = 'card-sub';
       if (e.ok) {
-        sub.textContent = [e.routine.weight, fmtDuration(e.total)].filter(Boolean).join(' · ');
+        sub.textContent = View.cardLabel(e.routine.weight, e.total);
         b.addEventListener('click', function () { selected = i; startRoutine(i); });
       } else {
         b.disabled = true;

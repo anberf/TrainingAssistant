@@ -120,7 +120,7 @@ AC:
 - Pure `formatTotal(sec)` (in `view.js`) tested for 0, 58, 60, 3531, 3723 s; end screen uses it (static test or view-model test).
 
 ### T17 — Cleanup + release v2
-Status: todo
+Status: done
 - `routines/demo.json`: drop `"weight": "none"`; picker card omits the weight part when a routine has no weight (shows only duration).
 - Delete `docs/routine-drafts/` (superseded by `routines/kb-60-core-full-body.json`).
 - Release: bump `CACHE_VERSION` in `sw.js` to `"v2"`, rename CHANGELOG `## Unreleased` to `## v2 (<date>)` and add a fresh empty `## Unreleased` above it.

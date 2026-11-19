@@ -117,3 +117,17 @@ test('end screen uses View.formatTotal', () => {
   const src = require('fs').readFileSync(require('path').join(__dirname, '../js/app.js'), 'utf8');
   assert.ok(/done-elapsed[^\n]*View\.formatTotal\(/.test(src));
 });
+
+test('cardLabel: weight + duration, or duration only without weight', () => {
+  const { cardLabel } = require('../js/view.js');
+  assert.strictEqual(cardLabel('10 kg', 3531), '10 kg · 59 min');
+  for (const w of [undefined, null, '', '  ', 'none']) assert.strictEqual(cardLabel(w, 600), '10 min');
+  assert.strictEqual(cardLabel(undefined, 20), '20 s');
+});
+
+test('picker card uses View.cardLabel; routine-drafts removed', () => {
+  const fs = require('fs'), path = require('path');
+  const src = fs.readFileSync(path.join(__dirname, '../js/app.js'), 'utf8');
+  assert.ok(/View\.cardLabel\(/.test(src));
+  assert.ok(!fs.existsSync(path.join(__dirname, '../docs/routine-drafts')));
+});

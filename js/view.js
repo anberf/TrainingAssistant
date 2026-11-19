@@ -77,5 +77,13 @@
     return v;
   }
 
-  return { toView: toView, formatCountdown: formatCountdown, formatTotal: formatTotal, targetLabel: targetLabel };
+  function cardLabel(weight, totalSec) {
+    var m = Math.round(totalSec / 60);
+    var dur = m < 1 ? totalSec + ' s' : m + ' min';
+    var w = typeof weight === 'string' ? weight.trim() : '';
+    if (!w || w.toLowerCase() === 'none') return dur;
+    return w + ' · ' + dur;
+  }
+
+  return { cardLabel: cardLabel, toView: toView, formatCountdown: formatCountdown, formatTotal: formatTotal, targetLabel: targetLabel };
 });
