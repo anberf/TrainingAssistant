@@ -69,7 +69,7 @@ AC:
 - Tests with mocked `document`/`navigator`: acquire/release/re-acquire calls; graceful when APIs absent.
 
 ### T10 — Optional exercise clips
-Status: todo
+Status: done
 - Show `<video muted loop playsinline>` for current (or next, during pause) step's clip; hide on error/missing.
 AC:
 - View-model test: clip chosen correctly for exercise vs pause. Manual: missing clip path shows no broken element.

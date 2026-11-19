@@ -133,6 +133,26 @@
     });
   }
 
+  // Optional clip: hidden when absent or on load error; src only changes when the path changes.
+  function renderClip(src) {
+    if (cache.clip === src) return;
+    cache.clip = src;
+    var vid = $('run-clip');
+    vid.hidden = true;
+    if (!src) {
+      vid.pause();
+      vid.removeAttribute('src');
+      vid.load();
+      return;
+    }
+    vid.onloadeddata = function () { if (cache.clip === src) vid.hidden = false; };
+    vid.onerror = function () { vid.hidden = true; };
+    vid.muted = true;
+    vid.src = src;
+    var p = vid.play();
+    if (p && p.catch) p.catch(function () {});
+  }
+
   function render() {
     var state = engine.getState();
     if (state.phase === 'finished') {
@@ -153,6 +173,7 @@
     setText('run-next', v.nextUp ? 'NEXT UP: ' + v.nextUp : '');
     setText('run-focus', v.cuesFor === 'next' && v.focusName ? 'Next: ' + v.focusName + (v.target ? ' ' + v.target : '') : '');
     renderCues(v.cues);
+    renderClip(v.clip);
     setText('btn-toggle-label', v.paused ? 'Resume' : 'Pause');
     $('paused-overlay').hidden = !v.paused;
   }

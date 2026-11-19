@@ -39,3 +39,9 @@ test('control buttons sized per SPEC section 5 in CSS', () => {
   assert.match(css, /#controls button\s*\{[^}]*min-width:\s*25vw/);
   assert.match(css, /#controls button\s*\{[^}]*min-height:\s*12vh/);
 });
+
+test('clip video: muted/loop/playsinline, hidden by default, hides on error', () => {
+  assert.match(html, /<video id="run-clip" muted loop playsinline hidden><\/video>/);
+  assert.match(appJs, /renderClip\(v\.clip\)/);
+  assert.match(appJs, /vid\.onerror\s*=\s*function\s*\(\)\s*\{\s*vid\.hidden = true/);
+});
