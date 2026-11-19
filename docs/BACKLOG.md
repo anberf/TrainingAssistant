@@ -13,7 +13,7 @@ AC:
 - Opening via a static server shows title + "No routine loaded" with no console errors.
 
 ### T02 — Routine validator + expansion
-Status: todo
+Status: done
 - `js/routine.js`: `validateRoutine(obj) -> { ok, errors[], warnings[] }`, `stepDuration(step, defaults)`, `expand(routine) -> flatSteps[]`, `totalDuration(routine)` per SPEC §3 (schema v2: blocks, rounds, restBetweenRounds, secPerRep, perSide).
 AC:
 - Validation tests: valid routine; missing name; bad type; both/neither reps & seconds; pause with reps; exercise cues ≠ 3; cue > 30 chars; pause without cues is OK; bad `secPerRep`; bad `rounds`/`restBetweenRounds`; empty block; bad clip path (`http:`, `//`, `..`); unknown field → warning only.
