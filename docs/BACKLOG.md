@@ -42,7 +42,7 @@ AC:
 - Tests for every row/column in SPEC §5 incl. media keys; unmapped keys → null; no exit/menu action exists during a run.
 
 ### T06 — View-model (pure)
-Status: todo
+Status: done
 - `js/view.js`: `toView(engineState) -> { title, badge, countdown, target, blockLabel, index, nextUp, cues[], cuesFor: 'current'|'next', clip, theme, paused }`.
 AC:
 - Tests: exercise shows own cues; pause shows NEXT step name + target + cues; reps target `×10`, perSide `×10 / side`, seconds steps no target; countdown `m:ss` when ≥ 60 else `ss`; blockLabel `Block A · round 2/3`; last step nextUp = "Finish"; paused flag.
