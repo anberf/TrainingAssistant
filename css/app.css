@@ -53,3 +53,16 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #run-clip[hidden] { display: none; }
 #done-elapsed { font-size: 6vh; color: var(--muted); }
 #btn-home { min-height: 14vh; min-width: 40vw; font-size: 5vh; font-weight: 800; background: #fff; color: #000; border: 0; border-radius: 2vh; }
+
+/* ---- T14: portrait phones — scale by width so long names/cues stay readable ---- */
+@media (orientation: portrait) {
+  :root { --size-title: min(8vh, 9vw); --size-countdown: min(30vh, 38vw); --size-cue: min(5vh, 5.5vw); }
+  #run-title { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  #run-cues li { white-space: normal; }
+  #run-target { font-size: min(8vh, 9vw); }
+  #run-focus { font-size: min(5vh, 6vw); }
+  #run-next { font-size: min(3.5vh, 4.5vw); }
+  #run-meta { font-size: min(3vh, 4vw); }
+  #controls button { font-size: min(4vh, 5vw); }
+  #paused-overlay { font-size: min(18vh, 18vw); }
+}

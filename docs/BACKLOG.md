@@ -97,7 +97,7 @@ AC:
 - Test: expanded total duration = 3531 s (≈ 58.9 min) and 78 flat steps (incl. generated round rests); block order Warm-up, Block A, Transition, Block B, Cool-down.
 
 ### T14 — TV readability + end-to-end pass
-Status: todo
+Status: done
 - Review sizes/contrast on 1920×1080, 1280×720, phone landscape + portrait; long names/cues shrink or ellipsize.
 - Simulated full-run test: engine through the KB 60 routine with fake clock and zero input, assert event sequence and finish time.
 AC:

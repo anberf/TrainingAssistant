@@ -5,6 +5,7 @@ Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, r
 ## Unreleased
 - T12: tests/release.test.js (CACHE_VERSION == top CHANGELOG version) + README.md.
 - T13: routines/kb-60-core-full-body.json (3531 s, 78 steps) registered in index.json + registry test.
+- T14: contrast test (>= 7:1 tokens, size tokens), E2E KB 60 simulation test, portrait CSS scaling for long names/cues.
 
 ## v1 (2026-11-19)
 - Setup: CLAUDE.md, docs (SPEC, BACKLOG, DECISIONS, QUESTIONS), run_loop.ps1, test harness.
