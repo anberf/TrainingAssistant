@@ -1,0 +1,16 @@
+:root {
+  --bg: #0a0a0a;
+  --fg: #ffffff;
+  --muted: #b0b0b0;
+  --accent-exercise: #ffb300;
+  --accent-rest: #4fc3f7;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --size-title: 8vh;
+  --size-countdown: 30vh;
+  --size-cue: 5vh;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font-family: var(--font); }
+#app { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+#app-title { font-size: var(--size-title); margin: 0 0 2vh; }
+#app-status { font-size: var(--size-cue); color: var(--muted); margin: 0; }

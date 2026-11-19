@@ -4,7 +4,7 @@ Rules: do tasks in order; one task per session. Status: `todo` | `done` | `block
 `run_loop.ps1` parses `### Txx — title` headings and the `Status:` line directly below. Keep that format.
 
 ### T01 — App shell + test harness
-Status: todo
+Status: done
 - `index.html` (dark, landscape-first, loads `css/app.css` and `js/*.js` as classic scripts), `css/app.css` with color/size tokens.
 - `js/` UMD stub module `app-info.js` exporting `{ name, version }`.
 AC:
