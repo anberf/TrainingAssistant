@@ -16,3 +16,4 @@ Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, r
 - T09: js/screen.js (fullscreen on Start; wake lock acquire/release/re-acquire on visibilitychange) wired in app.js + mock tests.
 - T10: Optional exercise clips (muted looping video for current/next step; hidden if missing/failed).
 - T10 review fixes: view-model test that an exercise uses its own clip, not the next step's.
+- T11: manifest.webmanifest, generated icons (tools/make-icons.js), sw.js (APP_SHELL + runtime routine/clip precache, cache-first, old-cache cleanup, skipWaiting/clients.claim), SW registered in app.js, tests/pwa.test.js.

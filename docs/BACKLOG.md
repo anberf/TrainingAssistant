@@ -75,7 +75,7 @@ AC:
 - View-model test: clip chosen correctly for exercise vs pause. Manual: missing clip path shows no broken element.
 
 ### T11 — PWA: manifest, icons, service worker
-Status: todo
+Status: done
 - `manifest.webmanifest`, `icons/` (192, 512, maskable; generated locally), `sw.js` with `CACHE_VERSION`, precache list, cache-first, old cache cleanup, skipWaiting/clientsClaim. Register SW in `app.js`.
 - Precache = static `APP_SHELL` array + runtime fetch of `routines/index.json` (routines + their clips).
 AC:
