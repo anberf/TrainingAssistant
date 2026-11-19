@@ -29,7 +29,7 @@ AC:
 - Adding an unlisted routine file makes the test fail with a clear message.
 
 ### T04 — Timer engine (pure, fully automatic)
-Status: todo
+Status: done
 - `js/engine.js`: state machine over expanded flat steps. API: `create(flatSteps, opts)`, `start(nowMs)`, `tick(nowMs)`, `togglePause(nowMs)`, `skip(nowMs)`, `back(nowMs)`, `getState()`. Events: `step`, `beep` (3/2/1), `final-beep`, `finished`.
 - Phases: `idle` → `ready` (5 s) → steps → `finished`. Every step timed by `durationSec`; auto-advance at 0. No API waits for "done".
 AC:
