@@ -57,7 +57,7 @@ AC:
 - Manual (in self-audit): demo routine runs start→finish with ONE tap and no further input; pause/skip/back work by tap and by keyboard.
 
 ### T08 — Beeps (WebAudio)
-Status: todo
+Status: done
 - `js/audio.js`: `createBeeper(AudioContextCtor)`; `unlock()`, `beep()` (~880 Hz, 120 ms), `finalBeep()` (~1320 Hz, 400 ms). Wired to engine events; `unlock()` on Start tap.
 AC:
 - Tests with a mock AudioContext: correct frequencies/durations scheduled; no throw when AudioContext missing.

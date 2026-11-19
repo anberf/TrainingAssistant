@@ -12,3 +12,4 @@ Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, r
 - T05: js/keys.js — pure mapKey(key, screen) per SPEC §5 + tests.
 - T06: js/view.js — pure toView(engineState) view-model (cues/target/countdown/blockLabel/nextUp/theme/paused) + tests.
 - T07: js/app.js UI wiring (picker cards, run screen, tap bottom bar, PAUSED overlay, end screen, keyboard via keys.js) + CSS + static UI test.
+- T08: audio.js with createBeeper (unlock, beep, finalBeep, onEvent), wired to engine events in app.js, with mock-AudioContext tests.

@@ -9,6 +9,7 @@
   var entries = [];   // { file, name, routine, ok, error, total }
   var selected = 0;
   var cache = {};
+  var beeper = Audio2.createBeeper(window.AudioContext || window.webkitAudioContext);
 
   function setText(id, text) {
     if (cache[id] === text) return;
@@ -99,7 +100,8 @@
   function startRoutine(i) {
     var e = entries[i];
     if (!e || !e.ok) return;
-    engine = Engine.create(Routine.expand(e.routine));
+    beeper.unlock();
+    engine = Engine.create(Routine.expand(e.routine), { onEvent: beeper.onEvent });
     cache = {};
     showScreen('run');
     engine.start(performance.now());
