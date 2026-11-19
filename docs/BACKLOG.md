@@ -48,7 +48,7 @@ AC:
 - Tests: exercise shows own cues; pause shows NEXT step name + target + cues; reps target `×10`, perSide `×10 / side`, seconds steps no target; countdown `m:ss` when ≥ 60 else `ss`; blockLabel `Block A · round 2/3`; last step nextUp = "Finish"; paused flag.
 
 ### T07 — Run screen UI wiring (tap-first)
-Status: todo
+Status: done
 - `js/app.js`: picker (routine cards from `routines/index.json`: name, weight, total duration; invalid ones disabled with error), DOM rendering of the view-model, `requestAnimationFrame` loop calling `engine.tick`.
 - Tap controls are primary: bottom bar `◀ Back` · `⏯ Pause/Resume` · `▶ Skip` (sizes per SPEC §5), routine cards tappable = Start. Keyboard/remote via `keys.js` as secondary. "PAUSED" overlay. End screen with "Back to routines".
 - CSS per SPEC §6 (viewport units, exercise vs rest accent).
