@@ -158,7 +158,7 @@
     if (state.phase === 'finished') {
       cancelAnimationFrame(rafId);
       screenCtl.finish();
-      $('done-elapsed').textContent = 'Total time ' + View.formatCountdown(Math.round(state.totalElapsedMs / 1000));
+      $('done-elapsed').textContent = 'Total time ' + View.formatTotal(state.totalElapsedMs / 1000);
       showScreen('done');
       return;
     }

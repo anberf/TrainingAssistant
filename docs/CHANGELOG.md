@@ -7,6 +7,7 @@ Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, r
 - T13: routines/kb-60-core-full-body.json (3531 s, 78 steps) registered in index.json + registry test.
 - T14: contrast test (>= 7:1 tokens, size tokens), E2E KB 60 simulation test, portrait CSS scaling for long names/cues.
 - T15: rest/get-ready countdown has no target (view-model `nextTarget` feeds the enlarged "Next:" line); Next line 7vh, status 4.5vh, NEXT UP 5vh.
+- T16: end screen total time uses `View.formatTotal` (m:ss / h:mm:ss).
 - Backlog: T15–T17 added from browser check (rest-screen target, secondary text sizes, total-time format, cleanup + v2 release); SPEC §4/§6 sizes updated.
 
 ## v1 (2026-11-19)

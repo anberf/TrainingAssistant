@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { toView, formatCountdown } = require('../js/view.js');
+const { toView, formatCountdown, formatTotal } = require('../js/view.js');
 const Engine = require('../js/engine.js');
 
 const cues = (p) => [p + '1', p + '2', p + '3'];
@@ -103,4 +103,17 @@ test('live engine state feeds the view', () => {
   e.start(0);
   e.tick(46000);
   assert.strictEqual(toView(e.getState()).title, 'Pause');
+});
+
+test('formatTotal: m:ss, h:mm:ss from 1 h', () => {
+  assert.strictEqual(formatTotal(0), '0:00');
+  assert.strictEqual(formatTotal(58), '0:58');
+  assert.strictEqual(formatTotal(60), '1:00');
+  assert.strictEqual(formatTotal(3531), '58:51');
+  assert.strictEqual(formatTotal(3723), '1:02:03');
+});
+
+test('end screen uses View.formatTotal', () => {
+  const src = require('fs').readFileSync(require('path').join(__dirname, '../js/app.js'), 'utf8');
+  assert.ok(/done-elapsed[^\n]*View\.formatTotal\(/.test(src));
 });

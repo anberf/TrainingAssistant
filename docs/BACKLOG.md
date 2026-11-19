@@ -114,7 +114,7 @@ AC:
 - Portrait phone (375×812) still fits without overlapping the control bar (state checked in self-audit).
 
 ### T16 — End screen total time format
-Status: todo
+Status: done
 - Total time on the end screen shows `m:ss` (`0:58`, `58:51`), `h:mm:ss` from 1 h (`1:02:03`). Found in browser check: showed "Total time 1".
 AC:
 - Pure `formatTotal(sec)` (in `view.js`) tested for 0, 58, 60, 3531, 3723 s; end screen uses it (static test or view-model test).

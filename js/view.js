@@ -9,6 +9,15 @@
     return Math.floor(sec / 60) + ':' + (s < 10 ? '0' : '') + s;
   }
 
+  // Total time: m:ss, h:mm:ss from 1 h.
+  function formatTotal(sec) {
+    sec = Math.max(0, Math.round(sec || 0));
+    var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+    var ss = (s < 10 ? '0' : '') + s;
+    if (h > 0) return h + ':' + (m < 10 ? '0' : '') + m + ':' + ss;
+    return m + ':' + ss;
+  }
+
   function targetLabel(step) {
     if (!step || step.reps === undefined || step.reps === null) return '';
     return '×' + step.reps + (step.perSide ? ' / side' : '');
@@ -68,5 +77,5 @@
     return v;
   }
 
-  return { toView: toView, formatCountdown: formatCountdown, targetLabel: targetLabel };
+  return { toView: toView, formatCountdown: formatCountdown, formatTotal: formatTotal, targetLabel: targetLabel };
 });
