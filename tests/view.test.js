@@ -42,6 +42,15 @@ test('seconds steps have no target; exercise without clip has empty clip', () =>
   assert.strictEqual(v.target, '');
   assert.strictEqual(v.clip, '');
 });
+test('exercise uses its OWN clip, not the next step clip', () => {
+  const own = { name: 'A', type: 'exercise', durationSec: 30, cues: cues('a'), clip: 'clips/a.mp4' };
+  const nxt = { name: 'B', type: 'exercise', durationSec: 30, cues: cues('b'), clip: 'clips/b.mp4' };
+  const none = { name: 'C', type: 'exercise', durationSec: 30, cues: cues('c') };
+  const st = (step, next) => ({ phase: 'step', paused: false, index: 0, total: 2, step, next, remainingSec: 5 });
+  assert.strictEqual(toView(st(own, nxt)).clip, 'clips/a.mp4');
+  assert.strictEqual(toView(st(own, none)).clip, 'clips/a.mp4');
+  assert.strictEqual(toView(st(none, nxt)).clip, '');
+});
 test('countdown format', () => {
   assert.strictEqual(formatCountdown(59), '59');
   assert.strictEqual(formatCountdown(60), '1:00');
