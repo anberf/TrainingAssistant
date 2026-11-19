@@ -1,0 +1,21 @@
+{
+  "id": "demo",
+  "name": "Demo",
+  "description": "Short test routine",
+  "weight": "none",
+  "defaults": { "secPerRep": 2 },
+  "blocks": [
+    {
+      "name": "Block A",
+      "rounds": 2,
+      "restBetweenRounds": 5,
+      "steps": [
+        { "name": "Air squat", "type": "exercise", "seconds": 10,
+          "cues": ["Chest up", "Knees out", "Drive through heels"] },
+        { "name": "Pause", "type": "pause", "seconds": 10 },
+        { "name": "Halo", "type": "exercise", "reps": 5, "perSide": true, "secPerRep": 1,
+          "cues": ["Ribs down", "Bell close to head", "Smooth circles"] }
+      ]
+    }
+  ]
+}

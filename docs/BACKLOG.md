@@ -22,7 +22,7 @@ AC:
 - Expansion tests: rounds repeated; `Rest` inserted between rounds but not after the last; flat steps carry block/round/rounds/durationSec.
 
 ### T03 — Routine registry + demo routine
-Status: todo
+Status: done
 - `routines/index.json`, `routines/demo.json` (short schema-v2 routine: 1 block × 2 rounds, 3 steps, ~10 s steps, uses `perSide` once, for testing).
 - Test: every `routines/*.json` (except index) is valid AND listed in `index.json`; every listed file exists.
 AC:
