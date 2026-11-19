@@ -83,7 +83,7 @@ AC:
 - Manual: load once, go offline (DevTools), reload → app + routines work.
 
 ### T12 — Release/versioning check + README
-Status: todo
+Status: done
 - `tests/release.test.js`: `CACHE_VERSION` in `sw.js` equals the top released version in CHANGELOG.
 - `README.md`: run locally (any static server, e.g. `python -m http.server`), deploy on GitHub Pages (Settings → Pages → main / root), how to add a routine.
 AC:
