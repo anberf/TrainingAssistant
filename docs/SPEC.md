@@ -48,7 +48,7 @@ Offline kettlebell workout timer. Runs on a phone (PWA) and is mirrored/cast to 
   - `secPerRep` (optional, number > 0): overrides `defaults.secPerRep`; global default 3.
   - `perSide` (optional bool): work is done on both sides → duration × 2; display adds "/ side".
   - `cues`: exercise → exactly 3 non-empty strings, each ≤ 30 chars. Pause → cues optional (a pause shows the NEXT exercise's cues).
-  - `clip` (optional): relative local path (no `http(s):`, no `//`, no `..`) to a video (`.mp4`, `.webm`) or image (`.svg`, `.gif`, `.webp`, `.png`, `.jpg`, `.jpeg`); other extensions are errors. Default pictures: original animated SVG stick figures `clips/<exercise-kebab>.svg` (D32).
+  - `clip` (optional): relative local path (no `http(s):`, no `//`, no `..`) to a video (`.mp4`, `.webm`) or image (`.svg`, `.gif`, `.webp`, `.png`, `.jpg`, `.jpeg`); other extensions are errors. Default pictures: user-made animated GIFs `clips/<exercise-kebab>.gif` (D33; supersedes the D32 SVGs).
   - Unknown fields → warning, not error.
 - **Duration** (seconds) of every step:
   - reps step: `reps × secPerRep × (perSide ? 2 : 1)`, where effective `secPerRep` = pace exercise override (by step name) > step `secPerRep` > pace `secPerRep` > `defaults.secPerRep` > 3 (pace: §4a).
