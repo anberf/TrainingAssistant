@@ -164,3 +164,14 @@ AC:
 - Test (`tests/clips.test.js`): every exercise step in KB 60 has a `clip`; every clip referenced by any routine exists; each SVG starts with `<svg`, has `viewBox="0 0 200 200"`, contains `<animate`, contains none of `<script`, `<image`, `<text`, `http`, `href=`, and is ≤ 8 KB; file names are lowercase-kebab.
 - Registry/E2E tests still pass (KB 60 3531 s / 78 steps unchanged).
 - Self-audit: list each file with the key poses drawn.
+
+### T21 — Picture stays still while the countdown ticks
+Status: todo
+- User report (phone): during rest/get-ready the picture/video beside the countdown shifts sideways when the countdown's width changes (e.g. `10` → `9`, `1:00` → `59`), because `#run-clock` is a centered flex row sized by its content. SPEC §4 (Picture), §6; D31, D34.
+- Fix in CSS (and markup only if needed): the media (`#run-img`, `#run-clip`) keeps the same on-screen position for the whole rest/get-ready, whatever the countdown shows (`m:ss`, `ss`, 1 or 2 digits). E.g. give the countdown a fixed width wide enough for its longest rest/get-ready value (`ch`-based, keep `tabular-nums`) or use a fixed grid column, so the countdown's width does not move the media. Exercise steps (countdown + `×N` target, no media) must not get worse.
+- Keep existing sizes/rules: countdown ≥ 30vh, media height ≥ 25vh landscape, portrait (375×812) no overlap with the control bar; landscape order countdown left, picture right.
+- Release v8: bump `CACHE_VERSION` in `sw.js` and `version` in `js/app-info.js` to `v8`; CHANGELOG `## v8 (date)` section.
+AC:
+- Static CSS test (`tests/ui.test.js`): `#run-countdown` has a fixed width that does not depend on content (e.g. a `width`/`min-width` in `ch`, ≥ 4ch to fit `m:ss`; or an equivalent fixed grid track for the countdown) and keeps `font-variant-numeric: tabular-nums`; existing size tests (countdown ≥ 30vh, media ≥ 25vh) still pass.
+- Release test passes with `v8` in both files.
+- Self-audit: explain why the media x-position no longer depends on the countdown text (1-digit, 2-digit, `m:ss`), and that nothing overflows at 1280×720 and 375×812.
