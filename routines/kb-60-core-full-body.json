@@ -32,7 +32,7 @@
         { "name": "Goblet squat", "type": "exercise", "clip": "clips/goblet-squat.webp", "reps": 12,
           "cues": ["Bell at chest, elbows in", "Sit between your heels", "Drive up through feet"] },
         { "name": "Pause", "type": "pause", "seconds": 20 },
-        { "name": "Turkish get-up", "type": "exercise", "clip": "clips/turkish-get-up.webp", "reps": 3, "perSide": true, "secPerRep": 20,
+        { "name": "Turkish get-up", "type": "exercise", "clip": "clips/turkish-get-up.mp4", "reps": 3, "perSide": true, "secPerRep": 20,
           "cues": ["Eyes on the bell", "Arm locked overhead", "Slow and controlled"] },
         { "name": "Pause", "type": "pause", "seconds": 20 },
         { "name": "Goblet reverse lunge", "type": "exercise", "clip": "clips/goblet-reverse-lunge.webp", "reps": 8, "perSide": true,

@@ -4,6 +4,9 @@ Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, r
 
 ## Unreleased
 
+## v6 (2026-11-20)
+- Clips: Turkish get-up is now a user video (`clips/turkish-get-up.mp4`, seconds 5–55 of the source, H.264 144×256, no audio, 402 KB) replacing the WebP; clip test and SPEC §3 accept MP4 clips (D36). Release v6: CACHE_VERSION + AppInfo.version v6.
+
 ## v5 (2026-11-20)
 - Clips: new halo clip (user GIF → 480×270 animated WebP, 161 KB). Release v5: CACHE_VERSION + AppInfo.version v5.
 
