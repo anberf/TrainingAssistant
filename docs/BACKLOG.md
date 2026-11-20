@@ -155,7 +155,7 @@ AC:
 - Self-audit: at 1280×720 and 375×812, a rest with an SVG clip shows countdown + picture side by side, with no overlap.
 
 ### T20 — Stick-figure pictures for every exercise
-Status: todo
+Status: done
 - User request: original animated stick figures (drawn in SVG by the implementer) for every exercise in `routines/kb-60-core-full-body.json`: Two-hand swing, Goblet squat, Halo, Deadlift, Goblet reverse lunge, Single-arm row, Single-arm overhead press, Turkish get-up, Suitcase march, Dead bug, Hollow hold, Plank pull-through, Russian twist, Leg & hip stretch (+ any other exercise names in that file). D32.
 - Files: `clips/<lowercase-kebab-name>.svg` (e.g. `clips/turkish-get-up.svg`, `clips/leg-hip-stretch.svg`). Square `viewBox="0 0 200 200"`, transparent background, side view unless another view is clearer. Figure: round head + thick lines, stroke `#ffffff`, `stroke-width` ≥ 6, round caps. Kettlebell (handle + body) in `#ffb300`. A floor line in `#b0b0b0`.
 - Animation: SMIL only (`<animate>` on `d`/`points`/coords or `<animateTransform>`), loop `repeatCount="indefinite"`, cycle 1.5–4 s, 2–4 key poses showing the movement's start and end position (e.g. swing: hinge → standing with bell at chest height; TGU: lying → seated → standing). No `<script>`, no `<image>`, no `<text>`, no external references (no `http`, no `href` to files). Each file ≤ 8 KB.
