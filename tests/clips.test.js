@@ -24,14 +24,16 @@ test('every clip referenced by any routine exists', () => {
   }
 });
 
-test('clips/*.gif: lowercase-kebab names, real GIF, size <= 5 MB', () => {
+test('clips/*.webp: lowercase-kebab names, animated WebP, size <= 512 KB', () => {
   const files = fs.readdirSync(path.join(root, 'clips'));
   assert.ok(files.length >= 14);
   for (const f of files) {
-    assert.match(f, /^[a-z0-9]+(-[a-z0-9]+)*.gif$/, 'not a lowercase-kebab .gif: ' + f);
+    assert.match(f, /^[a-z0-9]+(-[a-z0-9]+)*.webp$/, 'not a lowercase-kebab .webp: ' + f);
     const buf = fs.readFileSync(path.join(root, 'clips', f));
-    assert.ok(/^GIF8[79]a$/.test(buf.subarray(0, 6).toString('latin1')), f + ' is not a GIF');
-    assert.ok(buf.length <= 5 * 1024 * 1024, f + ' > 5 MB');
+    assert.strictEqual(buf.subarray(0, 4).toString('latin1'), 'RIFF', f + ' is not RIFF');
+    assert.strictEqual(buf.subarray(8, 12).toString('latin1'), 'WEBP', f + ' is not WebP');
+    assert.ok(buf.includes(Buffer.from('ANIM')), f + ' is not animated');
+    assert.ok(buf.length <= 512 * 1024, f + ' > 512 KB');
   }
 });
 

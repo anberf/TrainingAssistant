@@ -12,7 +12,7 @@
         { "name": "Air squat", "type": "exercise", "seconds": 10,
           "cues": ["Chest up", "Knees out", "Drive through heels"] },
         { "name": "Pause", "type": "pause", "seconds": 10 },
-        { "name": "Halo", "type": "exercise", "clip": "clips/halo.gif", "reps": 5, "perSide": true, "secPerRep": 1,
+        { "name": "Halo", "type": "exercise", "clip": "clips/halo.webp", "reps": 5, "perSide": true, "secPerRep": 1,
           "cues": ["Ribs down", "Bell close to head", "Smooth circles"] }
       ]
     }
