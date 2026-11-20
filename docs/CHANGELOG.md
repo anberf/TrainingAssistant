@@ -3,7 +3,9 @@
 Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, rename to `## vN (date)` and bump `CACHE_VERSION` in `sw.js` to `vN`.
 
 ## Unreleased
-- Picker: `Version vN` below the routine list (`AppInfo.version` = v3, test keeps it equal to CACHE_VERSION) (D35).
+
+## v4 (2026-11-20)
+- Picker: `Version vN` below the routine list (`AppInfo.version`, test keeps it equal to CACHE_VERSION) (D35). Release v4: CACHE_VERSION + AppInfo.version v4.
 
 ## v3 (2026-11-20)
 - Clips: GIFs converted to 480×270 animated WebP (39 MB → 3 MB); routines + clip test updated (D34). Release v3: CACHE_VERSION v3.
