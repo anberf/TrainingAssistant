@@ -166,7 +166,7 @@ AC:
 - Self-audit: list each file with the key poses drawn.
 
 ### T21 — Picture stays still while the countdown ticks
-Status: todo
+Status: done
 - User report (phone): during rest/get-ready the picture/video beside the countdown shifts sideways when the countdown's width changes (e.g. `10` → `9`, `1:00` → `59`), because `#run-clock` is a centered flex row sized by its content. SPEC §4 (Picture), §6; D31, D34.
 - Fix in CSS (and markup only if needed): the media (`#run-img`, `#run-clip`) keeps the same on-screen position for the whole rest/get-ready, whatever the countdown shows (`m:ss`, `ss`, 1 or 2 digits). E.g. give the countdown a fixed width wide enough for its longest rest/get-ready value (`ch`-based, keep `tabular-nums`) or use a fixed grid column, so the countdown's width does not move the media. Exercise steps (countdown + `×N` target, no media) must not get worse.
 - Keep existing sizes/rules: countdown ≥ 30vh, media height ≥ 25vh landscape, portrait (375×812) no overlap with the control bar; landscape order countdown left, picture right.

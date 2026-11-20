@@ -4,6 +4,9 @@ Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, r
 
 ## Unreleased
 
+## v8 (2026-11-20)
+- T21: rest/get-ready picture no longer shifts while the countdown ticks: `#run-countdown` has a fixed `4.4ch` width (tabular-nums, centered); portrait stacks countdown above picture (D38). Release v8: CACHE_VERSION + AppInfo.version v8.
+
 ## v7 (2026-11-20)
 - Clips: Turkish get-up video now starts at source second 10 (was 5) and plays 1.5× faster (source 10–55 s → 30 s, 296 KB) (D37). Release v7: CACHE_VERSION + AppInfo.version v7.
 

@@ -54,3 +54,12 @@ test('T19: #run-img exists beside the countdown, hides on error; media CSS heigh
   const m = css.match(/#run-img, #run-clip\s*\{[^}]*height:\s*([0-9.]+)vh/);
   assert.ok(m && parseFloat(m[1]) >= 25);
 });
+
+test('T21: #run-countdown has a fixed ch width (>= 4ch) and tabular-nums so the media does not shift', () => {
+  const css = fs.readFileSync(path.join(root, 'css/app.css'), 'utf8');
+  const rule = css.match(/#run-countdown\s*\{([^}]*)\}/)[1];
+  const w = rule.match(/(?:^|[;\s])width:\s*([0-9.]+)ch/);
+  assert.ok(w && parseFloat(w[1]) >= 4, 'fixed width in ch >= 4');
+  assert.match(rule, /flex:\s*none/);
+  assert.match(rule, /font-variant-numeric:\s*tabular-nums/);
+});
