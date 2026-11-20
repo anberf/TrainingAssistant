@@ -4,6 +4,9 @@ Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, r
 
 ## Unreleased
 
+## v7 (2026-11-20)
+- Clips: Turkish get-up video now starts at source second 10 (was 5) and plays 1.5× faster (source 10–55 s → 30 s, 296 KB) (D37). Release v7: CACHE_VERSION + AppInfo.version v7.
+
 ## v6 (2026-11-20)
 - Clips: Turkish get-up is now a user video (`clips/turkish-get-up.mp4`, seconds 5–55 of the source, H.264 144×256, no audio, 402 KB) replacing the WebP; clip test and SPEC §3 accept MP4 clips (D36). Release v6: CACHE_VERSION + AppInfo.version v6.
 
