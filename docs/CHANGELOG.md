@@ -3,6 +3,7 @@
 Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, rename to `## vN (date)` and bump `CACHE_VERSION` in `sw.js` to `vN`.
 
 ## Unreleased
+- Picker: header (`#app-title`) renamed from "Kettlebell TV Timer" to "Training Assistant" (page `<title>`, manifest and `AppInfo.name` unchanged).
 
 ## v8 (2026-11-20)
 - T21: rest/get-ready picture no longer shifts while the countdown ticks: `#run-countdown` has a fixed `4.4ch` width (tabular-nums, centered); portrait stacks countdown above picture (D38). Release v8: CACHE_VERSION + AppInfo.version v8.
