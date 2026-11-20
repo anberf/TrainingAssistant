@@ -8,6 +8,8 @@
   var BLOCK_KEYS = ['name', 'rounds', 'restBetweenRounds', 'steps'];
   var STEP_KEYS = ['name', 'type', 'reps', 'seconds', 'secPerRep', 'perSide', 'cues', 'clip'];
 
+  var CLIP_EXTS = ['mp4', 'webm', 'svg', 'gif', 'webp', 'png', 'jpg', 'jpeg'];
+
   function isObj(v) { return v !== null && typeof v === 'object' && !Array.isArray(v); }
   function isInt(v) { return typeof v === 'number' && isFinite(v) && Math.floor(v) === v; }
   function posNum(v) { return typeof v === 'number' && isFinite(v) && v > 0; }
@@ -20,6 +22,8 @@
     if (p.indexOf('//') !== -1) return 'must not contain "//"';
     if (p.charAt(0) === '/' || p.charAt(0) === '\\') return 'must be relative';
     if (p.split(/[\/\\]/).indexOf('..') !== -1) return 'must not contain ".."';
+    var ext = /\.([a-z0-9]+)$/i.exec(p.split(/[?#]/)[0]);
+    if (!ext || CLIP_EXTS.indexOf(ext[1].toLowerCase()) === -1) return 'unsupported type';
     return null;
   }
 

@@ -42,6 +42,15 @@ test('control buttons sized per SPEC section 5 in CSS', () => {
 
 test('clip video: muted/loop/playsinline, hidden by default, hides on error', () => {
   assert.match(html, /<video id="run-clip" muted loop playsinline hidden><\/video>/);
-  assert.match(appJs, /renderClip\(v\.clip\)/);
+  assert.match(appJs, /renderMedia\(v\.media\)/);
   assert.match(appJs, /vid\.onerror\s*=\s*function\s*\(\)\s*\{\s*vid\.hidden = true/);
+});
+
+test('T19: #run-img exists beside the countdown, hides on error; media CSS height >= 25vh', () => {
+  assert.match(html, /<img id="run-img"[^>]*hidden>/);
+  assert.ok(html.indexOf('id="run-img"') > html.indexOf('id="run-clock"') && html.indexOf('id="run-img"') < html.indexOf('id="run-focus"'));
+  assert.match(appJs, /img\.onerror\s*=\s*function\s*\(\)\s*\{\s*img\.hidden = true/);
+  const css = fs.readFileSync(path.join(root, 'css/app.css'), 'utf8');
+  const m = css.match(/#run-img, #run-clip\s*\{[^}]*height:\s*([0-9.]+)vh/);
+  assert.ok(m && parseFloat(m[1]) >= 25);
 });

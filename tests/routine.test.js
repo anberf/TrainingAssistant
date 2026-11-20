@@ -69,6 +69,15 @@ test('bad clip paths', () => {
   const r = good(); r.blocks[0].steps[0].clip = 'clips/swing.mp4';
   assert.ok(R.validateRoutine(r).ok);
 });
+test('T19 clip types: images and videos accepted; other/no extension rejected', () => {
+  for (const c of ['a.mp4', 'a.webm', 'clips/a.svg', 'a.gif', 'a.webp', 'a.png', 'a.jpg', 'a.jpeg', 'a.SVG']) {
+    const r = good(); r.blocks[0].steps[0].clip = c;
+    assert.ok(R.validateRoutine(r).ok, c);
+  }
+  for (const c of ['clips/a.txt', 'clips/a', 'clips/a.mp4.txt', 'clips/a.']) {
+    has(errs((r) => { r.blocks[0].steps[0].clip = c; }), 'steps[0].clip: unsupported type');
+  }
+});
 test('unknown field is warning only', () => {
   const r = good(); r.foo = 1; r.blocks[0].bar = 2; r.blocks[0].steps[0].baz = 3;
   const v = R.validateRoutine(r);

@@ -193,24 +193,32 @@
     });
   }
 
-  // Optional clip: hidden when absent or on load error; src only changes when the path changes.
-  function renderClip(src) {
-    if (cache.clip === src) return;
-    cache.clip = src;
-    var vid = $('run-clip');
-    vid.hidden = true;
-    if (!src) {
-      vid.pause();
-      vid.removeAttribute('src');
-      vid.load();
-      return;
+  // Optional picture beside the rest countdown: <img> or <video>; hidden when absent or on error.
+  // src only changes when the path changes.
+  function renderMedia(media) {
+    var src = media ? media.src : '';
+    var kind = media ? media.kind : '';
+    var key = kind + ':' + src;
+    if (cache.media === key) return;
+    cache.media = key;
+    var img = $('run-img'), vid = $('run-clip');
+    img.hidden = true; vid.hidden = true;
+    img.onload = img.onerror = vid.onloadeddata = vid.onerror = null;
+    if (kind !== 'image') img.removeAttribute('src');
+    if (kind !== 'video') { vid.pause(); vid.removeAttribute('src'); vid.load(); }
+    if (!src) return;
+    if (kind === 'image') {
+      img.onload = function () { if (cache.media === key) img.hidden = false; };
+      img.onerror = function () { img.hidden = true; };
+      img.src = src;
+    } else {
+      vid.onloadeddata = function () { if (cache.media === key) vid.hidden = false; };
+      vid.onerror = function () { vid.hidden = true; };
+      vid.muted = true;
+      vid.src = src;
+      var p = vid.play();
+      if (p && p.catch) p.catch(function () {});
     }
-    vid.onloadeddata = function () { if (cache.clip === src) vid.hidden = false; };
-    vid.onerror = function () { vid.hidden = true; };
-    vid.muted = true;
-    vid.src = src;
-    var p = vid.play();
-    if (p && p.catch) p.catch(function () {});
   }
 
   function render() {
@@ -233,7 +241,7 @@
     setText('run-next', v.nextUp ? 'NEXT UP: ' + v.nextUp : '');
     setText('run-focus', v.cuesFor === 'next' && v.focusName ? 'Next: ' + v.focusName + (v.nextTarget ? ' ' + v.nextTarget : '') : '');
     renderCues(v.cues);
-    renderClip(v.clip);
+    renderMedia(v.media);
     setText('btn-toggle-label', v.paused ? 'Resume' : 'Pause');
     $('paused-overlay').hidden = !v.paused;
   }

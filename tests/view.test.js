@@ -35,7 +35,7 @@ test('pause shows NEXT exercise name, target, cues, clip', () => {
   assert.strictEqual(v.target, '');
   assert.strictEqual(v.nextTarget, '×10 / side');
   assert.deepStrictEqual(v.cues, cues('h'));
-  assert.strictEqual(v.clip, 'clips/halo.mp4');
+  assert.deepStrictEqual(v.media, { src: 'clips/halo.mp4', kind: 'video' });
   assert.strictEqual(v.nextUp, 'Halo');
 });
 test('get-ready: no countdown-side target; next target exposed separately', () => {
@@ -47,19 +47,26 @@ test('get-ready: no countdown-side target; next target exposed separately', () =
 test('exercise step has no nextTarget', () => {
   assert.strictEqual(toView(at(0)).nextTarget, '');
 });
-test('seconds steps have no target; exercise without clip has empty clip', () => {
+test('seconds steps have no target; exercise step has no media', () => {
   const v = toView(at(3));
   assert.strictEqual(v.target, '');
-  assert.strictEqual(v.clip, '');
+  assert.strictEqual(v.media, null);
 });
-test('exercise uses its OWN clip, not the next step clip', () => {
-  const own = { name: 'A', type: 'exercise', durationSec: 30, cues: cues('a'), clip: 'clips/a.mp4' };
-  const nxt = { name: 'B', type: 'exercise', durationSec: 30, cues: cues('b'), clip: 'clips/b.mp4' };
+test('T19 media: rest -> next exercise picture with kind; get-ready -> step 1; exercise -> null', () => {
+  const own = { name: 'A', type: 'exercise', durationSec: 30, cues: cues('a'), clip: 'clips/a.svg' };
+  const nxt = { name: 'B', type: 'exercise', durationSec: 30, cues: cues('b'), clip: 'clips/b.svg' };
+  const vid = { name: 'V', type: 'exercise', durationSec: 30, cues: cues('v'), clip: 'clips/v.WEBM' };
   const none = { name: 'C', type: 'exercise', durationSec: 30, cues: cues('c') };
-  const st = (step, next) => ({ phase: 'step', paused: false, index: 0, total: 2, step, next, remainingSec: 5 });
-  assert.strictEqual(toView(st(own, nxt)).clip, 'clips/a.mp4');
-  assert.strictEqual(toView(st(own, none)).clip, 'clips/a.mp4');
-  assert.strictEqual(toView(st(none, nxt)).clip, '');
+  const rest = { name: 'Rest', type: 'pause', durationSec: 10, cues: [] };
+  const st = (step, next) => ({ phase: 'step', paused: false, index: 0, total: 3, step, next, remainingSec: 5 });
+  assert.deepStrictEqual(toView(st(rest, nxt)).media, { src: 'clips/b.svg', kind: 'image' });
+  assert.deepStrictEqual(toView(st(rest, vid)).media, { src: 'clips/v.WEBM', kind: 'video' });
+  assert.strictEqual(toView(st(rest, none)).media, null);
+  assert.strictEqual(toView(st(rest, null)).media, null);
+  assert.strictEqual(toView(st(own, nxt)).media, null);
+  assert.strictEqual(toView(st(own, none)).media, null);
+  const ready = toView({ phase: 'ready', paused: false, total: 3, step: null, next: own, remainingSec: 5 });
+  assert.deepStrictEqual(ready.media, { src: 'clips/a.svg', kind: 'image' });
 });
 test('countdown format', () => {
   assert.strictEqual(formatCountdown(59), '59');

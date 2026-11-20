@@ -143,7 +143,7 @@ AC:
 - Self-audit: in the browser, changing the pace updates card totals; the setting survives a reload.
 
 ### T19 — Exercise picture beside the rest countdown
-Status: todo
+Status: done
 - User request: during rest and get-ready, show a picture of the NEXT exercise beside the big countdown, so it is recognized faster than from the word cues. SPEC §3 (`clip` may be an image), §4, §6; D31.
 - `clip` may be a video (`.mp4`, `.webm`) or an image (`.svg`, `.gif`, `.webp`, `.png`, `.jpg`, `.jpeg`). Validator: any other extension is an error (`clip: unsupported type`).
 - View-model: `media = { src, kind: 'video'|'image' }` or null. Rest/get-ready: the next exercise's clip. Exercise steps: null (no media during exercise; this replaces T10's below-cues video).

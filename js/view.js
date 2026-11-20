@@ -23,6 +23,14 @@
     return '×' + step.reps + (step.perSide ? ' / side' : '');
   }
 
+  var VIDEO_EXTS = ['mp4', 'webm'];
+  // Picture shown beside the rest/get-ready countdown: { src, kind } or null.
+  function mediaFor(step) {
+    if (!step || typeof step.clip !== 'string' || !step.clip) return null;
+    var m = /\.([a-z0-9]+)$/i.exec(step.clip.split(/[?#]/)[0]);
+    return { src: step.clip, kind: m && VIDEO_EXTS.indexOf(m[1].toLowerCase()) !== -1 ? 'video' : 'image' };
+  }
+
   function blockLabel(step) {
     if (!step || !step.block) return '';
     return step.rounds > 1 ? step.block + ' · round ' + step.round + '/' + step.rounds : step.block;
@@ -34,7 +42,7 @@
   function toView(state) {
     var v = {
       title: '', badge: '', countdown: '', target: '', blockLabel: '', index: '',
-      nextUp: '', nextTarget: '', cues: [], cuesFor: 'current', clip: '', theme: 'idle',
+      nextUp: '', nextTarget: '', cues: [], cuesFor: 'current', media: null, theme: 'idle',
       paused: !!(state && state.paused), focusName: ''
     };
     if (!state) return v;
@@ -49,7 +57,7 @@
       v.cuesFor = 'next';
       if (next) {
         v.focusName = next.name; v.nextTarget = targetLabel(next); v.cues = (next.cues || []).slice();
-        v.clip = next.clip || ''; v.nextUp = next.name; v.blockLabel = blockLabel(next);
+        v.media = mediaFor(next); v.nextUp = next.name; v.blockLabel = blockLabel(next);
       }
     } else if (state.phase === 'step' && step) {
       var isPause = step.type === 'pause';
@@ -66,7 +74,7 @@
         v.focusName = focus.name; v.cues = (focus.cues || []).slice();
         // Rest: target belongs to the NEXT exercise, never beside the rest countdown.
         if (isPause) v.nextTarget = targetLabel(focus); else v.target = targetLabel(focus);
-        v.clip = focus.clip || '';
+        if (isPause) v.media = mediaFor(focus);
       }
     } else if (state.phase === 'finished') {
       v.title = 'Done';
