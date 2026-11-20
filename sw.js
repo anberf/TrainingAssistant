@@ -12,6 +12,7 @@ const APP_SHELL = [
   'js/audio.js',
   'js/engine.js',
   'js/keys.js',
+  'js/pace.js',
   'js/routine.js',
   'js/screen.js',
   'js/view.js',

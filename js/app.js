@@ -27,6 +27,70 @@
     if (name !== 'run') app.setAttribute('data-theme', name === 'done' ? 'done' : 'idle');
   }
 
+  // ---- Pace settings (SPEC 4a) ----
+  var PACE_KEY = 'kb-timer-pace';
+  var pace = loadPace();
+
+  function loadPace() {
+    try { return Pace.normalize(JSON.parse(localStorage.getItem(PACE_KEY))); } catch (e) { return Pace.normalize(null); }
+  }
+  function savePace() {
+    try { localStorage.setItem(PACE_KEY, JSON.stringify(pace)); } catch (e) { /* storage unavailable */ }
+  }
+  function fmtSec(v) { return v + ' s'; }
+
+  function paceRow(label, valueText, onMinus, onPlus) {
+    var row = document.createElement('div');
+    row.className = 'pace-row';
+    var l = document.createElement('span');
+    l.className = 'pace-label';
+    l.textContent = label;
+    var v = document.createElement('span');
+    v.className = 'pace-value';
+    v.textContent = valueText;
+    var m = document.createElement('button');
+    m.type = 'button';
+    m.textContent = '−';
+    m.setAttribute('aria-label', 'Decrease ' + label);
+    var p = document.createElement('button');
+    p.type = 'button';
+    p.textContent = '+';
+    p.setAttribute('aria-label', 'Increase ' + label);
+    [[m, onMinus], [p, onPlus]].forEach(function (x) {
+      x[0].addEventListener('click', function () { x[0].blur(); x[1](); });
+    });
+    row.appendChild(l); row.appendChild(m); row.appendChild(v); row.appendChild(p);
+    return row;
+  }
+
+  function renderPace() {
+    $('pace-global-value').textContent = pace.secPerRep === null ? 'routine' : fmtSec(pace.secPerRep);
+    var box = $('pace-exercises');
+    box.textContent = '';
+    var list = Pace.overridable(entries.filter(function (e) { return e.ok; }).map(function (e) { return e.routine; }));
+    list.forEach(function (o) {
+      var cur = Object.prototype.hasOwnProperty.call(pace.exercises, o.name) ? pace.exercises[o.name] : o.value;
+      function change(dir) {
+        pace.exercises[o.name] = Pace.stepValue(cur, dir, 'exercise');
+        savePace(); renderPace(); renderPicker();
+      }
+      box.appendChild(paceRow(o.name, fmtSec(cur), function () { change(-1); }, function () { change(1); }));
+    });
+  }
+
+  function changeGlobal(dir) {
+    pace.secPerRep = Pace.stepValue(pace.secPerRep, dir, 'global');
+    savePace(); renderPace(); renderPicker();
+  }
+  function resetPace() {
+    pace = Pace.normalize(null);
+    savePace(); renderPace(); renderPicker();
+  }
+  [['pace-global-minus', function () { changeGlobal(-1); }], ['pace-global-plus', function () { changeGlobal(1); }],
+   ['pace-reset', resetPace]].forEach(function (x) {
+    $(x[0]).addEventListener('click', function () { $(x[0]).blur(); x[1](); });
+  });
+
   function renderPicker() {
     var ul = $('routine-list');
     ul.textContent = '';
@@ -42,7 +106,7 @@
       var sub = document.createElement('span');
       sub.className = 'card-sub';
       if (e.ok) {
-        sub.textContent = View.cardLabel(e.routine.weight, e.total);
+        sub.textContent = View.cardLabel(e.routine.weight, Routine.totalDuration(e.routine, pace));
         b.addEventListener('click', function () { selected = i; startRoutine(i); });
       } else {
         b.disabled = true;
@@ -72,6 +136,7 @@
     }).then(function (list) {
       entries = list;
       selected = Math.max(0, entries.findIndex(function (e) { return e.ok; }));
+      renderPace();
       renderPicker();
     }).catch(function () {
       entries = [];
@@ -98,7 +163,7 @@
     if (!e || !e.ok) return;
     beeper.unlock();
     screenCtl.start();
-    engine = Engine.create(Routine.expand(e.routine), { onEvent: beeper.onEvent });
+    engine = Engine.create(Routine.expand(e.routine, pace), { onEvent: beeper.onEvent });
     cache = {};
     showScreen('run');
     engine.start(performance.now());

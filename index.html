@@ -13,6 +13,17 @@
     <section id="screen-picker" class="screen">
       <h1 id="app-title">Kettlebell TV Timer</h1>
       <p id="app-status">No routine loaded</p>
+      <div id="pace-panel">
+        <h2 id="pace-title">Pace</h2>
+        <div id="pace-global" class="pace-row">
+          <span class="pace-label">Seconds per rep</span>
+          <button id="pace-global-minus" type="button" aria-label="Decrease seconds per rep">−</button>
+          <span id="pace-global-value" class="pace-value"></span>
+          <button id="pace-global-plus" type="button" aria-label="Increase seconds per rep">+</button>
+        </div>
+        <div id="pace-exercises"></div>
+        <button id="pace-reset" type="button">Reset</button>
+      </div>
       <ul id="routine-list"></ul>
     </section>
 
@@ -49,6 +60,7 @@
   </main>
   <script src="js/app-info.js"></script>
   <script src="js/routine.js"></script>
+  <script src="js/pace.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/keys.js"></script>
   <script src="js/view.js"></script>

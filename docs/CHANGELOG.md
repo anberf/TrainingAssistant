@@ -3,6 +3,7 @@
 Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, rename to `## vN (date)` and bump `CACHE_VERSION` in `sw.js` to `vN`.
 
 ## Unreleased
+- T18: adjustable rep pace: `js/pace.js`, optional `pace` arg on `stepDuration/expand/totalDuration`, picker Pace panel (global sec/rep + per-exercise steppers, Reset), saved in localStorage `kb-timer-pace`.
 - Backlog: T18 (adjustable rep pace), T19 (exercise picture beside rest countdown), T20 (stick-figure SVGs); SPEC §3/§4/§4a/§6, D30–D32.
 - Docs: README "Development workflow" (backlog task format, run_loop, manual browser/phone checks).
 

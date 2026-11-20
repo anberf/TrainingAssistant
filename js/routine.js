@@ -102,19 +102,25 @@
     return { ok: errors.length === 0, errors: errors, warnings: warnings };
   }
 
-  function stepDuration(step, defaults) {
+  function isSet(v) { return v !== undefined && v !== null; }
+
+  // Precedence: pace exercise override > step secPerRep > pace secPerRep > routine default > 3.
+  function stepDuration(step, defaults, pace) {
     var mult = step.perSide ? 2 : 1;
     if (step.reps !== undefined && step.reps !== null) {
-      var spr = step.secPerRep;
-      if (spr === undefined || spr === null) spr = defaults && defaults.secPerRep;
-      if (spr === undefined || spr === null) spr = DEFAULT_SEC_PER_REP;
+      var spr = pace && pace.exercises && Object.prototype.hasOwnProperty.call(pace.exercises, step.name)
+        ? pace.exercises[step.name] : undefined;
+      if (!isSet(spr)) spr = step.secPerRep;
+      if (!isSet(spr) && pace) spr = pace.secPerRep;
+      if (!isSet(spr)) spr = defaults && defaults.secPerRep;
+      if (!isSet(spr)) spr = DEFAULT_SEC_PER_REP;
       return step.reps * spr * mult;
     }
     return step.seconds * mult;
   }
 
   // Assumes a valid routine.
-  function expand(routine) {
+  function expand(routine, pace) {
     var out = [];
     var defaults = routine.defaults || {};
     routine.blocks.forEach(function (b) {
@@ -125,7 +131,7 @@
           var f = {
             name: s.name,
             type: s.type,
-            durationSec: stepDuration(s, defaults),
+            durationSec: stepDuration(s, defaults, pace),
             perSide: !!s.perSide,
             cues: s.cues ? s.cues.slice() : [],
             block: b.name,
@@ -147,8 +153,8 @@
     return out;
   }
 
-  function totalDuration(routine) {
-    return expand(routine).reduce(function (a, s) { return a + s.durationSec; }, 0);
+  function totalDuration(routine, pace) {
+    return expand(routine, pace).reduce(function (a, s) { return a + s.durationSec; }, 0);
   }
 
   return {

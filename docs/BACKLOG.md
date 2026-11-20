@@ -130,7 +130,7 @@ AC:
 - Release test (T12) passes with v2.
 
 ### T18 — Adjustable rep pace (global sec/rep + per-exercise overrides)
-Status: todo
+Status: done
 - User request: change the "seconds per rep" assumption without editing JSON, including the Turkish get-up's own pace. SPEC §3 (duration), §4a (pace settings); D30.
 - New pure UMD module `js/pace.js` (add to `index.html` before `app.js`, and to `APP_SHELL` in `sw.js`): `normalize(obj)` (drops invalid values), `stepValue(value, dir, kind)` (stepper rules from SPEC §4a), `overridable(routines)` (sorted distinct names of exercise steps with their own `secPerRep` across the given routines, with that base value).
 - `js/routine.js`: `stepDuration(step, defaults, pace?)`, `expand(routine, pace?)`, `totalDuration(routine, pace?)` use the effective sec/rep from SPEC §3. If `pace` is omitted, the result is the same as today.
