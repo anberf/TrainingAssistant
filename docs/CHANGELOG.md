@@ -3,6 +3,7 @@
 Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, rename to `## vN (date)` and bump `CACHE_VERSION` in `sw.js` to `vN`.
 
 ## Unreleased
+- Docs: README "Development workflow" (backlog task format, run_loop, manual browser/phone checks).
 
 ## v2 (2026-11-20)
 - T17: cleanup + release v2: `View.cardLabel` (no weight part when absent/"none"), demo.json weight dropped, docs/routine-drafts removed, CACHE_VERSION v2.
