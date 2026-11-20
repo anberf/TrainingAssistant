@@ -45,7 +45,7 @@ Project: offline kettlebell workout timer (phone PWA, mirrored to TV). Plain HTM
 - Tests: Node built-in runner only (`node:test`, `node:assert`). No jsdom, no test deps.
 - Routines are data: `routines/*.json` + listed in `routines/index.json`. Adding a routine must never require a code change.
 - Every release bumps `CACHE_VERSION` in `sw.js` (see SPEC §7).
-- Windows + Google Drive folder: use forward-slash relative paths in code; keep file names lowercase-kebab.
+- Developed on Windows, served from GitHub Pages (case-sensitive): use forward-slash relative paths in code; keep file names lowercase-kebab.
 
 ## 5. Self-audit (end of every implementer session)
 Final message must contain, in this format:
