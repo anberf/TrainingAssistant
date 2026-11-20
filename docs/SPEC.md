@@ -1,4 +1,4 @@
-# SPEC — Kettlebell TV Timer
+# SPEC — Training Assistant
 
 ## 1. Product
 Offline kettlebell workout timer. Runs on a phone (PWA) and is mirrored/cast to a TV, or opened directly in a TV/desktop browser. Fully auto-runs a routine: after Start, no step ever waits for input. Readable from 3 m.

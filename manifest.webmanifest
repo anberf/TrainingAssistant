@@ -1,6 +1,6 @@
 {
-  "name": "Kettlebell TV Timer",
-  "short_name": "KB Timer",
+  "name": "Training Assistant",
+  "short_name": "Training",
   "description": "Offline kettlebell workout timer",
   "start_url": "./index.html",
   "scope": "./",
