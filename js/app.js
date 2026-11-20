@@ -287,6 +287,7 @@
     act(action);
   });
 
+  $('app-version').textContent = 'Version ' + AppInfo.version;
   showScreen('picker');
   loadRoutines();
 

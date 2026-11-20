@@ -100,7 +100,8 @@ The ONLY user controls: **Start** (once, picker), **Pause/Resume**, **Skip**, **
 ## 7. PWA, offline, release
 - `manifest.webmanifest`: name, short_name, `display: fullscreen`, `orientation: landscape`, dark theme colors, local icons (192, 512, maskable).
 - `sw.js`: `const CACHE_VERSION = "vN"`; on install precache app shell + `routines/index.json` + every routine listed + their clips; cache-first fetch; on activate delete old caches; skipWaiting + clientsClaim so phones auto-update on next open.
-- Release = bump `CACHE_VERSION` + move CHANGELOG `Unreleased` to a version heading.
+- Release = bump `CACHE_VERSION` and `AppInfo.version` (`js/app-info.js`, same `vN`) + move CHANGELOG `Unreleased` to a version heading.
+- The picker shows `Version vN` (from `AppInfo.version`) below the routine list (D35).
 - Deploy: GitHub Pages from `main` (root). `run_loop.ps1` pushes after each approved task.
 
 ## 8. Quality

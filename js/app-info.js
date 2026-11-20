@@ -2,5 +2,5 @@
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.AppInfo = factory();
 })(typeof self !== 'undefined' ? self : this, function () {
-  return { name: 'Kettlebell TV Timer', version: '0.0.1' };
+  return { name: 'Kettlebell TV Timer', version: 'v3' };
 });

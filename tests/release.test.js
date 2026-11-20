@@ -19,6 +19,12 @@ test('CACHE_VERSION in sw.js equals top released CHANGELOG version', () => {
   assert.strictEqual(sw[1], top);
 });
 
+test('AppInfo.version (shown on the picker) equals CACHE_VERSION', () => {
+  const sw = read('sw.js').match(/const\s+CACHE_VERSION\s*=\s*["']([^"']+)["']/);
+  assert.ok(sw, 'CACHE_VERSION not found in sw.js');
+  assert.strictEqual(require('../js/app-info.js').version, sw[1]);
+});
+
 test('topReleased ignores Unreleased and picks the first version', () => {
   assert.strictEqual(topReleased('## Unreleased\n- x\n## v3 (d)\n## v2 (d)\n'), 'v3');
   assert.strictEqual(topReleased('## Unreleased\n'), null);

@@ -44,7 +44,7 @@ Project: offline kettlebell workout timer (phone PWA, mirrored to TV). Plain HTM
 - Keep logic pure and DOM-free where possible (engine, routine validation, key mapping, view-model) so it is testable in Node. DOM/Audio/WakeLock code stays thin.
 - Tests: Node built-in runner only (`node:test`, `node:assert`). No jsdom, no test deps.
 - Routines are data: `routines/*.json` + listed in `routines/index.json`. Adding a routine must never require a code change.
-- Every release bumps `CACHE_VERSION` in `sw.js` (see SPEC §7).
+- Every release bumps `CACHE_VERSION` in `sw.js` and `version` in `js/app-info.js` to the same `vN` (see SPEC §7).
 - Developed on Windows, served from GitHub Pages (case-sensitive): use forward-slash relative paths in code; keep file names lowercase-kebab.
 
 ## 5. Self-audit (end of every implementer session)
