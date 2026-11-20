@@ -4,7 +4,7 @@
 Offline kettlebell workout timer. Runs on a phone (PWA) and is mirrored/cast to a TV, or opened directly in a TV/desktop browser. Fully auto-runs a routine: after Start, no step ever waits for input. Readable from 3 m.
 
 ## 2. Platform & constraints
-- Single page: `index.html` + `css/`, `js/`, `routines/`, `clips/`, `icons/`, `manifest.webmanifest`, `sw.js`.
+- Single page: `index.html` + `css/`, `js/`, `routines/`, `clips/` (exercise pictures/videos), `icons/`, `manifest.webmanifest`, `sw.js`.
 - Plain JS/CSS. No frameworks, no CDN, no internet at runtime, no build step, no runtime deps.
 - Served over HTTP(S) (GitHub Pages; locally any static server). `file://` is NOT supported — D03.
 - Works fully offline after first load (service worker, §7).
@@ -48,10 +48,10 @@ Offline kettlebell workout timer. Runs on a phone (PWA) and is mirrored/cast to 
   - `secPerRep` (optional, number > 0): overrides `defaults.secPerRep`; global default 3.
   - `perSide` (optional bool): work is done on both sides → duration × 2; display adds "/ side".
   - `cues`: exercise → exactly 3 non-empty strings, each ≤ 30 chars. Pause → cues optional (a pause shows the NEXT exercise's cues).
-  - `clip` (optional): relative local path (no `http(s):`, no `//`, no `..`).
+  - `clip` (optional): relative local path (no `http(s):`, no `//`, no `..`) to a video (`.mp4`, `.webm`) or image (`.svg`, `.gif`, `.webp`, `.png`, `.jpg`, `.jpeg`); other extensions are errors. Default pictures: original animated SVG stick figures `clips/<exercise-kebab>.svg` (D32).
   - Unknown fields → warning, not error.
 - **Duration** (seconds) of every step:
-  - reps step: `reps × secPerRep × (perSide ? 2 : 1)`
+  - reps step: `reps × secPerRep × (perSide ? 2 : 1)`, where effective `secPerRep` = pace exercise override (by step name) > step `secPerRep` > pace `secPerRep` > `defaults.secPerRep` > 3 (pace: §4a).
   - seconds step: `seconds × (perSide ? 2 : 1)`
 - **Expansion** (`expand(routine) -> steps[]`): for each block, for each round r: the block steps, then (if r < rounds and restBetweenRounds > 0) a generated pause step `"Rest"` of that length. Each flat step carries `{ name, type, durationSec, reps?, perSide, cues, clip?, block, round, rounds }`.
 - Invalid routines are shown in the picker as disabled with the first error; they never crash the app.
@@ -61,10 +61,18 @@ Offline kettlebell workout timer. Runs on a phone (PWA) and is mirrored/cast to 
 - **Get-ready**: 5 s countdown before step 1 (shows step 1 as "next up" with its cues).
 - **Every step is timed** and auto-advances at 0. Nothing waits for input (D04 superseded by D11).
 - **Display during a step**: step name, type badge (EXERCISE / REST), big countdown `m:ss`/`ss`, for reps exercise steps a target label `×10` or `×10 / side` next to the countdown (never next to a rest/get-ready countdown — there the target appears only in the "Next:" line), block name + `round r/n`, step index `n / total`, "NEXT UP: <name>".
-- **Cues**: current exercise shows its 3 cues; during a pause the screen prominently shows the NEXT exercise's name, target, and its 3 cues (+ clip if any).
+- **Cues**: current exercise shows its 3 cues; during a pause the screen prominently shows the NEXT exercise's name, target, and its 3 cues.
+- **Picture**: during rest and get-ready, the NEXT exercise's `clip` (image or video) appears beside the big countdown (landscape: countdown left, picture right). No picture during exercise steps. Missing/failed clip → nothing shown (D31).
 - **Beeps** (WebAudio, generated tones, no audio files): short beep at 3, 2, 1 s remaining of every step; distinct longer/higher tone at 0. No beeps while paused.
 - **Paused**: countdown frozen, large "PAUSED" overlay.
 - **End screen**: "Done" + total elapsed time as `m:ss` (or `h:mm:ss` ≥ 1 h) + one button "Back to routines".
+
+## 4a. Pace settings (picker)
+- "Pace" panel at the top of the picker; tap controls only (no new keys).
+- Row "Seconds per rep": `−` value `+`. Value `routine` (= each routine's `defaults.secPerRep`, the initial state) or 1–6 s in 0.5 s steps; `+` from `routine` → 3.5, `−` from `routine` → 2.5.
+- One row per distinct exercise name that has its own step `secPerRep` in any valid routine (e.g. Turkish get-up 20 s): `−` value `+`, 1–60 s; step 0.5 s below 10 s, 5 s from 10 s up. Initial value = that step's `secPerRep`.
+- "Reset" restores all rows to the routine values.
+- Card durations update live; a run uses the pace in effect at Start. Saved in `localStorage` key `kb-timer-pace` = `{ "secPerRep": number|null, "exercises": { "<name>": number } }`; invalid/unavailable storage → routine values, never an error.
 
 ## 5. Controls
 The ONLY user controls: **Start** (once, picker), **Pause/Resume**, **Skip**, **Back**.
@@ -87,7 +95,7 @@ The ONLY user controls: **Start** (once, picker), **Pause/Resume**, **Skip**, **
 - High contrast: near-black background, white text, one accent color per step type (exercise vs rest); main text contrast ≥ 7:1.
 - Sizes in viewport units: countdown ≥ 30vh tall; step name ≥ 8vh; cues ≥ 5vh; "Next:" line during rest/get-ready ≥ 7vh; status line (badge, block/round, index) ≥ 4.5vh; "NEXT UP" ≥ 5vh. Readable at 3 m on a 40" TV. Long names/cues must not overflow (shrink or ellipsis).
 - Screen Wake Lock while a routine runs; re-acquire on `visibilitychange`; silently degrade if unsupported.
-- Optional clip: `<video muted loop playsinline autoplay>` from local path; missing/failed clip → hide video, no error.
+- Optional clip beside the rest/get-ready countdown: `<img>` for images, `<video muted loop playsinline autoplay>` for videos; height ≥ 25vh in landscape; missing/failed clip → hidden, no error.
 
 ## 7. PWA, offline, release
 - `manifest.webmanifest`: name, short_name, `display: fullscreen`, `orientation: landscape`, dark theme colors, local icons (192, 512, maskable).

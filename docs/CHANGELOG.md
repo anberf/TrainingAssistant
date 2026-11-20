@@ -3,6 +3,7 @@
 Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, rename to `## vN (date)` and bump `CACHE_VERSION` in `sw.js` to `vN`.
 
 ## Unreleased
+- Backlog: T18 (adjustable rep pace), T19 (exercise picture beside rest countdown), T20 (stick-figure SVGs); SPEC §3/§4/§4a/§6, D30–D32.
 - Docs: README "Development workflow" (backlog task format, run_loop, manual browser/phone checks).
 
 ## v2 (2026-11-20)
