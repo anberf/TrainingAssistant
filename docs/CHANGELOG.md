@@ -4,6 +4,9 @@ Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, r
 
 ## Unreleased
 
+## v5 (2026-11-20)
+- Clips: new halo clip (user GIF → 480×270 animated WebP, 161 KB). Release v5: CACHE_VERSION + AppInfo.version v5.
+
 ## v4 (2026-11-20)
 - Picker: `Version vN` below the routine list (`AppInfo.version`, test keeps it equal to CACHE_VERSION) (D35). Release v4: CACHE_VERSION + AppInfo.version v4.
 
