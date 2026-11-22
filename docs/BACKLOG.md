@@ -129,7 +129,7 @@ AC:
 - Self-audit: download the files in Chrome and show the `index.json` content for a mixed draft.
 
 ### T28 — Release v10
-Status: todo
+Status: done
 - Bump `CACHE_VERSION` in `sw.js` and `version` in `js/app-info.js` to `v10`; CHANGELOG `## Unreleased` → `## v10 (date)` with a fresh empty `## Unreleased` above.
 AC:
 - Release tests pass with `v10`.

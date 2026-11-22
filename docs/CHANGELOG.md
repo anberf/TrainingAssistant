@@ -3,6 +3,9 @@
 Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, rename to `## vN (date)` and bump `CACHE_VERSION` in `sw.js` to `vN`.
 
 ## Unreleased
+
+## v10 (2026-11-22)
+- T28: release v10 (CACHE_VERSION + AppInfo.version v10).
 - T27: owner "Publish (N changes)": `Drafts.publishFiles` → downloadable routine files + `index.json`, steps to upload on GitHub, "Mark as published"; README owner flow, exercise pictures, owner PIN; `docs/ROUTINE-PROMPT.md` (D45, D52).
 - T26: owner "Import routine": paste a Markdown/TSV table (`js/import.js`: `parseTable`, `toRoutine`, `fileName`, `preview`, `CHAT_PROMPT`) → row/column errors or preview + total + picture list → Add as an unpublished draft (`Drafts.add`) (D44, D51).
 - T25: exercises without `clip` get a default picture by name: `clips/<clip-name>.webp`, falling back to `.mp4` (`Routine.clipName`, view-model `media.fallback`, `renderMedia` fallback, SW precaches both paths best-effort) (D43).
