@@ -77,7 +77,7 @@ AC:
 - Self-audit: in the browser (with a temporary local hash, not committed), wrong PIN stays locked; right PIN unlocks and survives reload; Lock turns it off; Enter in the PIN field does not start a routine. Commit `js/owner-config.js` with an EMPTY hash.
 
 ### T24 — Owner: rename and remove routines (unpublished drafts)
-Status: todo
+Status: done
 - User change 4 (D42). SPEC §4b.
 - New pure UMD module `js/drafts.js` (global `Drafts`; in `index.html` + `APP_SHELL`). Drafts = `{ routines: { "<file>": routineObj }, removed: ["<file>"] }`. Functions: `normalize(obj)`; `rename(drafts, file, baseRoutine, newName)` (stores a copy of the routine with only `name` changed, trimmed; blank → error); `remove(drafts, file)`; `undo(drafts, file)` (drops that file's draft and removal); `apply(entries, drafts)` → entries with draft routines replacing loaded ones (`unpublished: true`), removed ones `removed: true`, and draft-only files (new routines, T26) appended; `isEmpty(drafts)`. All pure, inputs never mutated.
 - Saved in localStorage `kb-timer-drafts` (try/catch). Drafts are applied ONLY while owner mode is on; other devices never see them.

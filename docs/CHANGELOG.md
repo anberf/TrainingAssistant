@@ -3,6 +3,7 @@
 Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, rename to `## vN (date)` and bump `CACHE_VERSION` in `sw.js` to `vN`.
 
 ## Unreleased
+- T24: owner mode: Rename / Remove / Undo per routine card as local unpublished drafts (`js/drafts.js`, localStorage `kb-timer-drafts`), "unpublished" tag, removed cards greyed and not startable (D42, D49).
 - T23: owner mode: salted-SHA-256 PIN (`js/owner.js`, `js/owner-config.js`, `tools/set-pin.js`), picker Owner/Lock button + PIN panel, `data-owner` on `#app`; keydown ignores form fields (D41, D47).
 - T22: `sw.js` serves `routines/*` network-first (cache fallback offline), so published routine changes reach every device without a release (D39).
 

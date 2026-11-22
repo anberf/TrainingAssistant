@@ -10,6 +10,7 @@ const APP_SHELL = [
   'js/app-info.js',
   'js/app.js',
   'js/audio.js',
+  'js/drafts.js',
   'js/engine.js',
   'js/keys.js',
   'js/owner-config.js',

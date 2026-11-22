@@ -28,6 +28,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #owner-pin { font-size: 4vh; width: 12ch; max-width: 100%; padding: 1vh; background: #000; color: #fff; border: 0.4vh solid #666; border-radius: 1.5vh; }
 #owner-panel button { min-height: 6vh; padding: 0 3vw; font-size: 3vh; background: #2a2a2a; border: 0.4vh solid #666; border-radius: 1.5vh; }
 #owner-msg { margin: 1vh 0 0; font-size: 3vh; color: var(--muted); }
+/* T24: owner rename/remove, unpublished tag */
+.card.removed { opacity: 0.5; text-decoration: line-through; border-style: dashed; cursor: not-allowed; }
+.card-tag { align-self: flex-start; font-size: 2.5vh; padding: 0.3vh 1.5vw; border: 0.3vh solid var(--accent-exercise); border-radius: 1vh; color: var(--accent-exercise); }
+.owner-row { display: flex; flex-wrap: wrap; align-items: center; gap: 2vw; margin-top: 1vh; }
+.owner-act { min-height: 6vh; padding: 0 3vw; font-size: 3vh; background: #2a2a2a; border: 0.4vh solid #666; border-radius: 1.5vh; }
+.rename-input { flex: 1; min-width: 12ch; font-size: 3.5vh; padding: 1vh; background: #000; color: #fff; border: 0.4vh solid #666; border-radius: 1.5vh; }
+.rename-msg { font-size: 3vh; color: var(--muted); }
 #pace-panel { width: min(100%, 900px); margin-top: 1vh; padding: 1.5vh 3vw; background: #1a1a1a; border: 0.4vh solid #444; border-radius: 2vh; text-align: left; }
 #pace-title { margin: 0 0 1vh; font-size: 4vh; }
 .pace-row { display: flex; align-items: center; gap: 2vw; margin: 0.8vh 0; font-size: 3.5vh; }

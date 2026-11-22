@@ -6,7 +6,8 @@
   var screen = 'picker';
   var engine = null;
   var rafId = 0;
-  var entries = [];   // { file, name, routine, ok, error, total }
+  var entries = [];   // displayed: { file, name, routine, ok, error, total, unpublished?, removed? }
+  var baseEntries = []; // as loaded from routines/ (no drafts)
   var selected = 0;
   var cache = {};
   var screenCtl = ScreenCtl.create(document, navigator);
@@ -67,7 +68,7 @@
     $('pace-global-value').textContent = pace.secPerRep === null ? 'routine' : fmtSec(pace.secPerRep);
     var box = $('pace-exercises');
     box.textContent = '';
-    var list = Pace.overridable(entries.filter(function (e) { return e.ok; }).map(function (e) { return e.routine; }));
+    var list = Pace.overridable(entries.filter(function (e) { return e.ok && !e.removed; }).map(function (e) { return e.routine; }));
     list.forEach(function (o) {
       var cur = Object.prototype.hasOwnProperty.call(pace.exercises, o.name) ? pace.exercises[o.name] : o.value;
       function change(dir) {
@@ -91,6 +92,76 @@
     $(x[0]).addEventListener('click', function () { $(x[0]).blur(); x[1](); });
   });
 
+  function usable(e) { return !!e && e.ok && !e.removed; }
+
+  function smallBtn(label, onClick) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'owner-act';
+    b.textContent = label;
+    b.addEventListener('click', function () { b.blur(); onClick(); });
+    return b;
+  }
+
+  function ownerRow(e) {
+    var row = document.createElement('div');
+    row.className = 'owner-row';
+    if (e.removed) {
+      row.appendChild(smallBtn('Undo', function () { saveDrafts(Drafts.undo(drafts, e.file)); refresh(); }));
+    } else if (renamingFile === e.file) {
+      var inp = document.createElement('input');
+      inp.type = 'text';
+      inp.className = 'rename-input';
+      inp.value = e.name;
+      inp.maxLength = 60;
+      inp.setAttribute('aria-label', 'New routine name');
+      var msg = document.createElement('span');
+      msg.className = 'rename-msg';
+      var save = function () {
+        var res = Drafts.rename(drafts, e.file, e.routine, inp.value);
+        if (res.error) { msg.textContent = 'Name required'; return; }
+        renamingFile = null;
+        saveDrafts(res.drafts); refresh();
+      };
+      inp.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter') { ev.preventDefault(); save(); }
+        else if (ev.key === 'Escape') { renamingFile = null; renderPicker(); }
+      });
+      row.appendChild(inp);
+      row.appendChild(smallBtn('Save', save));
+      row.appendChild(smallBtn('Cancel', function () { renamingFile = null; renderPicker(); }));
+      row.appendChild(msg);
+      setTimeout(function () { inp.focus(); }, 0);
+    } else {
+      if (e.routine) row.appendChild(smallBtn('Rename', function () { renamingFile = e.file; renderPicker(); }));
+      row.appendChild(smallBtn('Remove', function () { saveDrafts(Drafts.remove(drafts, e.file)); refresh(); }));
+    }
+    return row;
+  }
+
+  // ---- Drafts (SPEC 4b, D42): owner-only, local to this device ----
+  var DRAFTS_KEY = 'kb-timer-drafts';
+  var drafts = loadDrafts();
+  var renamingFile = null;
+
+  function loadDrafts() {
+    try { return Drafts.normalize(JSON.parse(localStorage.getItem(DRAFTS_KEY))); } catch (e) { return Drafts.normalize(null); }
+  }
+  function saveDrafts(d) {
+    drafts = d;
+    try { localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts)); } catch (e) { /* storage unavailable */ }
+  }
+  // Recompute displayed entries from loaded routines (+ drafts while owner mode is on).
+  function refresh() {
+    var keep = entries[selected] ? entries[selected].file : null;
+    entries = ownerOn ? Drafts.apply(baseEntries, drafts) : baseEntries;
+    var i = entries.findIndex(function (e) { return e.file === keep && usable(e); });
+    if (i < 0) i = entries.findIndex(usable);
+    selected = Math.max(0, i);
+    renderPace();
+    renderPicker();
+  }
+
   function renderPicker() {
     var ul = $('routine-list');
     ul.textContent = '';
@@ -105,7 +176,11 @@
       b.appendChild(name);
       var sub = document.createElement('span');
       sub.className = 'card-sub';
-      if (e.ok) {
+      if (e.removed) {
+        b.disabled = true;
+        b.classList.add('removed');
+        sub.textContent = 'Removed — unpublished';
+      } else if (e.ok) {
         sub.textContent = View.cardLabel(e.routine.weight, Routine.totalDuration(e.routine, pace));
         b.addEventListener('click', function () { selected = i; startRoutine(i); });
       } else {
@@ -114,7 +189,14 @@
         sub.textContent = e.error;
       }
       b.appendChild(sub);
+      if (e.unpublished && !e.removed) {
+        var tag = document.createElement('span');
+        tag.className = 'card-tag';
+        tag.textContent = 'unpublished';
+        b.appendChild(tag);
+      }
       li.appendChild(b);
+      if (ownerOn) li.appendChild(ownerRow(e));
       ul.appendChild(li);
     });
     $('app-status').hidden = entries.length > 0;
@@ -134,11 +216,10 @@
         });
       }));
     }).then(function (list) {
-      entries = list;
-      selected = Math.max(0, entries.findIndex(function (e) { return e.ok; }));
-      renderPace();
-      renderPicker();
+      baseEntries = list;
+      refresh();
     }).catch(function () {
+      baseEntries = [];
       entries = [];
       renderPicker();
       $('app-status').hidden = false;
@@ -151,7 +232,7 @@
     var i = selected;
     for (var n = 0; n < entries.length; n++) {
       i = (i + dir + entries.length) % entries.length;
-      if (entries[i].ok) { selected = i; break; }
+      if (usable(entries[i])) { selected = i; break; }
     }
     renderPicker();
     var el = $('routine-list').querySelector('.selected');
@@ -160,7 +241,7 @@
 
   function startRoutine(i) {
     var e = entries[i];
-    if (!e || !e.ok) return;
+    if (!usable(e)) return;
     beeper.unlock();
     screenCtl.start();
     engine = Engine.create(Routine.expand(e.routine, pace), { onEvent: beeper.onEvent });
@@ -298,6 +379,8 @@
     app.setAttribute('data-owner', ownerOn ? 'on' : 'off');
     $('owner-btn').textContent = ownerOn ? 'Lock' : 'Owner';
     if (ownerOn) $('owner-panel').hidden = true;
+    renamingFile = null;
+    refresh();
   }
   function closeOwnerPanel() {
     $('owner-panel').hidden = true;
