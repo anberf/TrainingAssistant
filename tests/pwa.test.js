@@ -60,3 +60,59 @@ test('index.html links manifest; app.js registers sw.js', () => {
   assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /rel="manifest" href="manifest\.webmanifest"/);
   assert.match(fs.readFileSync(path.join(root, 'js/app.js'), 'utf8'), /serviceWorker\.register\('sw\.js'\)/);
 });
+
+// ---- T22: routines/* network-first, everything else cache-first ----
+function runFetch(url, { net, cached }) {
+  const src = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  const listeners = {};
+  const calls = { fetch: 0, put: [] };
+  const cache = { put: async (req, res) => { calls.put.push({ req, res }); } };
+  const sandbox = {
+    URL,
+    self: { addEventListener: (t, fn) => { listeners[t] = fn; }, location: { origin: 'https://x.test' } },
+    fetch: async () => { calls.fetch++; if (net instanceof Error) throw net; return net; },
+    caches: { match: async () => cached, open: async () => cache },
+  };
+  vm.createContext(sandbox);
+  vm.runInContext(src, sandbox);
+  let p;
+  listeners.fetch({
+    request: { method: 'GET', url },
+    respondWith: (x) => { p = x; },
+  });
+  return { p, calls };
+}
+const resp = (body, ok = true) => ({ ok, body, clone() { return this; } });
+
+test('routines/index.json: network copy wins and is cached', async () => {
+  const net = resp('net'), cached = resp('cached');
+  const { p, calls } = runFetch('https://x.test/app/routines/index.json', { net, cached });
+  assert.strictEqual(await p, net);
+  assert.strictEqual(calls.fetch, 1);
+  assert.strictEqual(calls.put.length, 1);
+  assert.strictEqual(calls.put[0].res, net);
+});
+
+test('routines/index.json: cached copy on network error or non-ok response', async () => {
+  const cached = resp('cached');
+  let r = runFetch('https://x.test/app/routines/index.json', { net: new Error('offline'), cached });
+  assert.strictEqual(await r.p, cached);
+  r = runFetch('https://x.test/app/routines/demo.json', { net: resp('bad', false), cached });
+  assert.strictEqual(await r.p, cached);
+  assert.strictEqual(r.calls.put.length, 0);
+});
+
+test('routines: no cache and non-ok -> network response; no cache and error -> rejects', async () => {
+  const bad = resp('404', false);
+  assert.strictEqual(await runFetch('https://x.test/routines/a.json', { net: bad, cached: undefined }).p, bad);
+  await assert.rejects(runFetch('https://x.test/routines/a.json', { net: new Error('off'), cached: undefined }).p);
+});
+
+test('clips and app shell stay cache-first (no fetch when cached)', async () => {
+  for (const u of ['https://x.test/app/clips/x.webp', 'https://x.test/app/js/app.js']) {
+    const cached = resp('cached');
+    const { p, calls } = runFetch(u, { net: resp('net'), cached });
+    assert.strictEqual(await p, cached);
+    assert.strictEqual(calls.fetch, 0);
+  }
+});

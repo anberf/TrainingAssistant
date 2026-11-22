@@ -54,7 +54,7 @@ AC:
 - Self-audit: explain why the media x-position no longer depends on the countdown text (1-digit, 2-digit, `m:ss`), and that nothing overflows at 1280×720 and 375×812.
 
 ### T22 — Published routine changes reach every device
-Status: todo
+Status: done
 - User change 4 (D39). Today `sw.js` serves `routines/*` cache-first, so a routine added/renamed on GitHub is invisible to phones that already opened the app until a release. SPEC §7.
 - `sw.js` fetch: requests whose path is under `routines/` (index.json + routine files) are **network-first**: fetch from network; on success put the response in the current cache and return it; on network error or non-ok response return the cached copy; if neither exists, return the network response/error. Everything else (app shell, clips) stays cache-first. Install-time precache unchanged.
 AC:

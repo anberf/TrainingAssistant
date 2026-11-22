@@ -65,6 +65,28 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.pathname.indexOf('/routines/') !== -1) {
+    // Network-first: published routine changes reach every device (D39).
+    event.respondWith((async () => {
+      let res;
+      try {
+        res = await fetch(event.request, { cache: 'no-cache' });
+      } catch (e) {
+        const cached = await caches.match(event.request, { ignoreSearch: true });
+        if (cached) return cached;
+        throw e;
+      }
+      if (res.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(event.request, res.clone());
+        return res;
+      }
+      const cached = await caches.match(event.request, { ignoreSearch: true });
+      return cached || res;
+    })());
+    return;
+  }
   event.respondWith((async () => {
     const hit = await caches.match(event.request, { ignoreSearch: true });
     if (hit) return hit;

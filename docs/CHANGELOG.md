@@ -3,6 +3,7 @@
 Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, rename to `## vN (date)` and bump `CACHE_VERSION` in `sw.js` to `vN`.
 
 ## Unreleased
+- T22: `sw.js` serves `routines/*` network-first (cache fallback offline), so published routine changes reach every device without a release (D39).
 
 ## v9 (2026-11-21)
 - Picker: header (`#app-title`) renamed from "Kettlebell TV Timer" to "Training Assistant" (page `<title>`, manifest and `AppInfo.name` unchanged).
