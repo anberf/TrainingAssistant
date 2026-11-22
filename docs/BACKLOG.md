@@ -133,3 +133,17 @@ Status: done
 - Bump `CACHE_VERSION` in `sw.js` and `version` in `js/app-info.js` to `v10`; CHANGELOG `## Unreleased` → `## v10 (date)` with a fresh empty `## Unreleased` above.
 AC:
 - Release tests pass with `v10`.
+
+### T29 — Owner: safe publish + Undo keeps imports
+Status: todo
+- Found in T26/T27 review + browser check (D53). SPEC §4b.
+- Bug 1 (data loss for everyone): if `routines/index.json` did not load (offline and never cached, or a bad response), `baseEntries` is empty and Publish produces an `index.json` listing only the new files; uploading it hides every published routine.
+  - New pure `Drafts.publishPlan(entries, drafts, indexOk)` → `{ files, error }`: when `indexOk` is not `true`, `files` = `[]` and `error` = `"Routine list not loaded. Open the app online, then publish."`; otherwise `files` = `publishFiles(entries, drafts)` and `error` = null. `publishFiles` unchanged.
+  - `app.js`: `indexOk` is true only when `routines/index.json` loaded and parsed to an object with a `routines` array (reset on every load). The Publish panel uses `publishPlan`: on error it shows the message and no Download buttons (Mark as published still available).
+- Bug 2: Remove → Undo on an unpublished imported routine deletes the import instead of restoring it.
+  - `Drafts.undo(drafts, file)`: if `file` is in `removed`, ONLY take it out of `removed` (keep any routine draft: rename or import). Otherwise drop that file's routine draft (reverts a rename / discards an import), as before.
+- Small: "Mark as published" clears drafts only when `window.confirm` returns `true`; if `confirm` is missing or throws, do nothing.
+AC:
+- `tests/drafts.test.js`: `publishPlan` with `indexOk` false/undefined → no files + the error text, with true → same as `publishFiles`; undo after remove of a draft-only (imported) routine keeps the routine draft and `apply` lists it again as unpublished, not removed; undo after remove of a renamed routine keeps the rename; undo of a non-removed rename drops the draft (existing behaviour).
+- Static test: `app.js` uses `Drafts.publishPlan` (not `publishFiles` directly) for the publish panel.
+- Self-audit: explain how `indexOk` is set and reset; browser check is optional.
