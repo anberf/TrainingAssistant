@@ -160,6 +160,7 @@
     selected = Math.max(0, i);
     renderPace();
     renderPicker();
+    renderPublishBtn();
   }
 
   function renderPicker() {
@@ -543,6 +544,57 @@
     .forEach(function (x) { $(x[0]).addEventListener('click', function () { $(x[0]).blur(); x[1](); }); });
   ['import-name', 'import-weight', 'import-text'].forEach(function (id) { $(id).addEventListener('input', invalidateCandidate); });
 
+  // ---- Publish drafts (SPEC 4b, D45): download files; no network ----
+  function renderPublishBtn() {
+    var n = Drafts.changeCount(drafts);
+    $('publish-btn').hidden = !(ownerOn && n > 0);
+    $('publish-btn').textContent = 'Publish (' + n + ' change' + (n === 1 ? '' : 's') + ')';
+    if ($('publish-btn').hidden) closePublish();
+  }
+  function closePublish() {
+    $('publish-panel').hidden = true;
+    $('publish-files').textContent = '';
+    $('publish-msg').textContent = '';
+  }
+  function downloadFile(f) {
+    try {
+      var url = URL.createObjectURL(new Blob([f.text], { type: 'application/json' }));
+      var a = document.createElement('a');
+      a.href = url; a.download = f.file;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    } catch (e) { $('publish-msg').textContent = 'Download failed.'; }
+  }
+  function openPublish() {
+    var ul = $('publish-files');
+    ul.textContent = '';
+    Drafts.publishFiles(baseEntries, drafts).forEach(function (f) {
+      var li = document.createElement('li');
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = 'Download';
+      b.addEventListener('click', function () { b.blur(); downloadFile(f); });
+      var span = document.createElement('span');
+      span.textContent = ' routines/' + f.file;
+      li.appendChild(b); li.appendChild(span);
+      ul.appendChild(li);
+    });
+    $('publish-panel').hidden = false;
+  }
+  $('publish-btn').addEventListener('click', function () {
+    $('publish-btn').blur();
+    if ($('publish-panel').hidden) openPublish(); else closePublish();
+  });
+  $('publish-close').addEventListener('click', function () { $('publish-close').blur(); closePublish(); });
+  $('publish-done').addEventListener('click', function () {
+    $('publish-done').blur();
+    var ok = true;
+    try { ok = window.confirm('Clear all unpublished changes? Do this only after uploading the files to GitHub.'); } catch (e) { ok = true; }
+    if (!ok) return;
+    saveDrafts(Drafts.normalize(null));
+    closePublish();
+    refresh();
+  });
+
   ownerOn = readOwner();
   renderOwner();
 
@@ -551,6 +603,7 @@
     var tg = ev.target && ev.target.tagName;
     if (tg === 'INPUT' || tg === 'TEXTAREA' || tg === 'SELECT') return;
     if (ev.target && ev.target.closest && ev.target.closest('#import-panel')) return;
+    if (ev.target && ev.target.closest && ev.target.closest('#publish-panel')) return;
     var action = Keys.mapKey(ev.key, screen);
     if (!action) return;
     ev.preventDefault();

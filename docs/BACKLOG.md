@@ -117,7 +117,7 @@ AC:
 - Self-audit: paste the SPEC §4c example on phone portrait and at 1280×720 → Check shows preview + total; Add → new card with unpublished tag; it starts and runs.
 
 ### T27 — Owner: publish changes + docs
-Status: todo
+Status: done
 - User change 4 (D45). SPEC §4b, README.
 - `Drafts.publishFiles(entries, drafts)` (pure) → `[{ file, text }]`: one file per new or renamed routine (`JSON.stringify(routine, null, 2)` + newline) and `index.json` = published order minus removed files, plus new files appended (`{ "routines": [...] }`, 2-space indent).
 - Picker in owner mode, when drafts are not empty: "Publish (N changes)" → panel `#publish-panel` listing each file with a "Download" button (Blob + `<a download>`), the steps ("Upload all files to the `routines/` folder on github.com → Commit changes. Everyone sees it next time they open the app.") and "Mark as published" (clears drafts after a confirm). No network calls.

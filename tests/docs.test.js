@@ -32,6 +32,11 @@ test('every backlog task has a parseable heading, status and acceptance criteria
   assert.strictEqual(new Set(ids).size, ids.length, 'duplicate task IDs');
 });
 
+test('docs/ROUTINE-PROMPT.md contains Import.CHAT_PROMPT verbatim', () => {
+  const Import = require('../js/import.js');
+  assert.ok(read('docs/ROUTINE-PROMPT.md').includes(Import.CHAT_PROMPT));
+});
+
 test('run_loop.ps1 is ASCII-only (Windows PowerShell 5.1 reads BOM-less files as ANSI)', () => {
   const buf = fs.readFileSync(path.join(root, 'run_loop.ps1'));
   const bad = buf.findIndex((b) => b > 0x7f);

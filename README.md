@@ -14,12 +14,31 @@ Open http://localhost:8000. Run tests: `node --test "tests/*.test.js"`.
 2. Repo Settings → Pages → Source: "Deploy from a branch", Branch `main`, folder `/ (root)`.
 3. Open the published URL once online; afterwards the app works offline.
 
-## Add a routine
-1. Create `routines/<id>.json` (lowercase-kebab name; schema in `docs/SPEC.md` §3).
-2. Add the file name to the list in `routines/index.json`.
-3. Optional clips: put files at the clip paths the routine references (relative, no `..`).
+## Add a routine (owner flow)
+1. In Claude Chat, paste the prompt from `docs/ROUTINE-PROMPT.md` plus your workout idea. You get one table.
+2. In the app: Owner (PIN) → **Import routine** → type the name (and weight), paste the table → **Check** (errors name the row and column; a preview shows the total time and which pictures exist) → **Add**. The routine shows as "unpublished" on your device only.
+3. **Publish (N changes)** → **Download** every listed file (the new/changed routine files and `index.json`).
+4. On github.com open the `routines/` folder → Add file → Upload files → drop all downloaded files → Commit changes. Everyone sees it the next time they open the app online.
+5. Back in the app: **Mark as published** (clears your drafts).
 
-No code change needed. A test checks every routine file is valid and listed.
+Rename and Remove (with Undo) work the same way: they are drafts until published.
+
+Manual route: create `routines/<id>.json` (lowercase-kebab; schema in `docs/SPEC.md` §3) and add its file name to `routines/index.json`. No code change needed. A test checks every routine file is valid and listed.
+
+## Exercise pictures
+An exercise without `clip` uses `clips/<clip-name>.webp`, or `clips/<clip-name>.mp4` if there is no WebP. clip-name = exercise name in lowercase, every run of characters other than a–z and 0–9 replaced by `-`, no `-` at the ends:
+- `Two-hand swing` → `clips/two-hand-swing.webp`
+- `Leg & hip stretch` → `clips/leg-hip-stretch.webp`
+- `Halo` → `clips/halo.webp`
+
+Upload the file to `clips/` on github.com (animated WebP 480×270 ≤ 512 KB, or H.264 MP4 without audio). No JSON change needed; a missing file just shows no picture. The import preview lists the expected file names with found / missing. An explicit `clip` in the routine always wins.
+
+## Owner PIN
+Owner mode (rename, remove, import, publish) is unlocked by a PIN. Set it once on your computer:
+```
+node tools/set-pin.js
+```
+Enter the PIN (4–12 digits) twice; it writes only a hash to `js/owner-config.js`. Commit and push, then do a release so phones get the new file. The PIN only hides the controls; the real protection is that only you can push to GitHub.
 
 ## Release
 Move CHANGELOG `Unreleased` to `## vN (date)` and set `CACHE_VERSION = "vN"` in `sw.js` so phones pick up the update. `tests/release.test.js` fails if they differ.

@@ -34,6 +34,16 @@
         <p id="owner-msg"></p>
       </div>
       <button id="import-btn" type="button" hidden>Import routine</button>
+      <button id="publish-btn" type="button" hidden>Publish</button>
+      <div id="publish-panel" hidden>
+        <p id="publish-steps">Download the files below. Upload all files to the <code>routines/</code> folder on github.com → Commit changes. Everyone sees it next time they open the app.</p>
+        <ul id="publish-files"></ul>
+        <div class="import-actions">
+          <button id="publish-done" type="button">Mark as published</button>
+          <button id="publish-close" type="button">Close</button>
+        </div>
+        <p id="publish-msg"></p>
+      </div>
       <div id="import-panel" hidden>
         <label class="import-label" for="import-name">Name (required)</label>
         <input id="import-name" type="text" maxlength="60" autocomplete="off">

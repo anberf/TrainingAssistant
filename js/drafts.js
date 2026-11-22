@@ -90,5 +90,32 @@
     return out;
   }
 
-  return { normalize: normalize, rename: rename, add: add, remove: remove, undo: undo, apply: apply, isEmpty: isEmpty };
+  // Files the owner uploads to routines/ (T27, D45). entries = routines as published (index order, no drafts).
+  // One file per new/renamed routine (removed ones skipped) + index.json when the list changes
+  // (a removal or a new file). Returns [{ file, text }].
+  function publishFiles(entries, drafts) {
+    var d = normalize(drafts);
+    var published = (entries || []).map(function (e) { return e.file; });
+    var out = [];
+    Object.keys(d.routines).forEach(function (f) {
+      if (d.removed.indexOf(f) !== -1) return;
+      out.push({ file: f, text: JSON.stringify(d.routines[f], null, 2) + '\n' });
+    });
+    var list = published.filter(function (f) { return d.removed.indexOf(f) === -1; });
+    var added = false;
+    Object.keys(d.routines).forEach(function (f) {
+      if (published.indexOf(f) === -1 && d.removed.indexOf(f) === -1) { list.push(f); added = true; }
+    });
+    var removedLive = published.some(function (f) { return d.removed.indexOf(f) !== -1; });
+    if (added || removedLive) out.push({ file: 'index.json', text: JSON.stringify({ routines: list }, null, 2) + '\n' });
+    return out;
+  }
+
+  // Number shown on the Publish button: draft routines + removals not already counted.
+  function changeCount(drafts) {
+    var d = normalize(drafts);
+    return Object.keys(d.routines).length + d.removed.filter(function (f) { return !has(d.routines, f); }).length;
+  }
+
+  return { publishFiles: publishFiles, changeCount: changeCount, normalize: normalize, rename: rename, add: add, remove: remove, undo: undo, apply: apply, isEmpty: isEmpty };
 });
