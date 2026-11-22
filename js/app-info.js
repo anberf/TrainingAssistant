@@ -2,5 +2,5 @@
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.AppInfo = factory();
 })(typeof self !== 'undefined' ? self : this, function () {
-  return { name: 'Training Assistant', version: 'v10' };
+  return { name: 'Training Assistant', version: 'v11' };
 });

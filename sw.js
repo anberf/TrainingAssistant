@@ -1,5 +1,5 @@
 'use strict';
-const CACHE_VERSION = "v10";
+const CACHE_VERSION = "v11";
 const CACHE_NAME = 'kb-timer-' + CACHE_VERSION;
 
 const APP_SHELL = [
