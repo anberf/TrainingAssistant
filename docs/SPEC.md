@@ -49,6 +49,7 @@ Offline kettlebell workout timer. Runs on a phone (PWA) and is mirrored/cast to 
   - `perSide` (optional bool): work is done on both sides → duration × 2; display adds "/ side".
   - `cues`: exercise → exactly 3 non-empty strings, each ≤ 30 chars. Pause → cues optional (a pause shows the NEXT exercise's cues).
   - `clip` (optional): relative local path (no `http(s):`, no `//`, no `..`) to a video (`.mp4`, `.webm`) or image (`.svg`, `.gif`, `.webp`, `.png`, `.jpg`, `.jpeg`); other extensions are errors. Default pictures: user-made exercise clips as animated WebP `clips/<exercise-kebab>.webp` (480×270) or, when a WebP would be too large, MP4 video `clips/<exercise-kebab>.mp4` (H.264, no audio); ≤ 512 KB each (D33, D34, D36).
+  - Picture naming rule (D43): an exercise step without `clip` uses `clips/<clip-name>.webp`, falling back to `clips/<clip-name>.mp4`; clip-name = exercise name lowercased, every run of non `a–z0–9` characters → `-`, trimmed (`Goblet reverse lunge` → `goblet-reverse-lunge`, `Leg & hip stretch` → `leg-hip-stretch`). Missing file → no picture. An explicit `clip` always wins.
   - Unknown fields → warning, not error.
 - **Duration** (seconds) of every step:
   - reps step: `reps × secPerRep × (perSide ? 2 : 1)`, where effective `secPerRep` = pace exercise override (by step name) > step `secPerRep` > pace `secPerRep` > `defaults.secPerRep` > 3 (pace: §4a).
@@ -73,6 +74,33 @@ Offline kettlebell workout timer. Runs on a phone (PWA) and is mirrored/cast to 
 - One row per distinct exercise name that has its own step `secPerRep` in any valid routine (e.g. Turkish get-up 20 s): `−` value `+`, 1–60 s; step 0.5 s below 10 s, 5 s from 10 s up. Initial value = that step's `secPerRep`.
 - "Reset" restores all rows to the routine values.
 - Card durations update live; a run uses the pace in effect at Start. Saved in `localStorage` key `kb-timer-pace` = `{ "secPerRep": number|null, "exercises": { "<name>": number } }`; invalid/unavailable storage → routine values, never an error.
+
+## 4b. Owner mode (picker; routine editing)
+- Purpose: only the owner edits the shared routines; everyone else only runs them and sets their own pace (§4a, per device). Shared routines = the files in the GitHub repo; only the owner can push (the real protection). Owner mode only hides controls (D40).
+- Unlock: "Owner" button below the version → PIN field → owner mode on this device (localStorage `kb-timer-owner` = PIN hash). PIN hash lives in `js/owner-config.js` (set with `node tools/set-pin.js`). Empty hash = cannot unlock. "Lock" turns it off (D41).
+- Owner controls (tap only; hidden when owner mode is off): per card "Rename" (display `name` only; file name and `id` stay) and "Remove" (+ "Undo"); "Import routine" (§4c); "Publish (N changes)".
+- Every change is an unpublished draft on the owner's device (localStorage `kb-timer-drafts`), visible only there, cards tagged "unpublished" (D42).
+- Publish = download the changed routine files + updated `routines/index.json`; the owner uploads them to `routines/` on github.com and commits. Others see the change the next time they open the app online (§7). "Mark as published" clears the drafts (D45).
+- Typing in any owner input never triggers picker keys (Enter/Space/arrows).
+
+## 4c. Import table format
+- Paste a Markdown pipe table or tab-separated text. Header row required; header names case-insensitive. Columns (in any order):
+  `Block | Rounds | Rest between rounds | Exercise | Type | Reps | Seconds | Per side | Sec per rep | Cue 1 | Cue 2 | Cue 3`. All required except `Sec per rep`.
+- One row per step, in order. `Block` filled on the first row of each block (blank = same block); `Rounds` (default 1) and `Rest between rounds` (seconds, default 0) read from the block's first row.
+- `Type`: `exercise` or `pause` (`rest` = pause). Exactly one of `Reps` / `Seconds` (whole numbers ≥ 1); pauses use `Seconds`. `Per side`: `yes`/`y`/`true`/`x` or blank/`no`. `Sec per rep`: optional number > 0 (e.g. Turkish get-up 20). `Cue 1–3`: exercises need all 3 (≤ 30 chars each); pauses leave them blank.
+- Routine `name` and `weight` are typed in the import panel; `id` = name in clip-name form (§3); `defaults.secPerRep` = 3. Pictures come from the naming rule (§3).
+- Example (total 570 s, 13 steps):
+
+| Block | Rounds | Rest between rounds | Exercise | Type | Reps | Seconds | Per side | Sec per rep | Cue 1 | Cue 2 | Cue 3 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Warm-up | 1 | 0 | Halo | exercise | 10 | | yes | | Bell close around head | Ribs down, glutes tight | Slow, smooth circles |
+| | | | Pause | pause | | 15 | | | | | |
+| Main | 3 | 60 | Two-hand swing | exercise | 15 | | | | Hinge, don't squat | Snap hips to stand | Arms are ropes |
+| | | | Pause | pause | | 20 | | | | | |
+| | | | Suitcase march | exercise | | 30 | yes | | Stand tall, no lean | Knees to hip height | Brace your core |
+
+- Claude Chat prompt (`Import.CHAT_PROMPT`, also `docs/ROUTINE-PROMPT.md`), to paste with the workout idea:
+  > Write my workout as ONE Markdown table with exactly these columns: Block | Rounds | Rest between rounds | Exercise | Type | Reps | Seconds | Per side | Sec per rep | Cue 1 | Cue 2 | Cue 3. One row per step, in order. Fill Block, Rounds and Rest between rounds (seconds) only on the first row of each block. Type is "exercise" or "pause". Use either Reps or Seconds (whole numbers), never both; pauses use Seconds. Per side is "yes" when the exercise is done on each side, else blank. Sec per rep only for slow exercises (e.g. Turkish get-up 20). Every exercise needs 3 short cues of at most 30 characters; pauses have no cues. Use the same exercise names every time. Output only the table.
 
 ## 5. Controls
 The ONLY user controls: **Start** (once, picker), **Pause/Resume**, **Skip**, **Back**.
@@ -99,7 +127,7 @@ The ONLY user controls: **Start** (once, picker), **Pause/Resume**, **Skip**, **
 
 ## 7. PWA, offline, release
 - `manifest.webmanifest`: name, short_name, `display: fullscreen`, `orientation: landscape`, dark theme colors, local icons (192, 512, maskable).
-- `sw.js`: `const CACHE_VERSION = "vN"`; on install precache app shell + `routines/index.json` + every routine listed + their clips; cache-first fetch; on activate delete old caches; skipWaiting + clientsClaim so phones auto-update on next open.
+- `sw.js`: `const CACHE_VERSION = "vN"`; on install precache app shell + `routines/index.json` + every routine listed + their clips (incl. naming-rule paths, best effort); fetch: `routines/*` network-first (cache fallback offline) so published routine changes reach every device without a release (D39), everything else cache-first; on activate delete old caches; skipWaiting + clientsClaim so phones auto-update on next open.
 - Release = bump `CACHE_VERSION` and `AppInfo.version` (`js/app-info.js`, same `vN`) + move CHANGELOG `Unreleased` to a version heading.
 - The picker shows `Version vN` (from `AppInfo.version`) below the routine list (D35).
 - Deploy: GitHub Pages from `main` (root). `run_loop.ps1` pushes after each approved task.

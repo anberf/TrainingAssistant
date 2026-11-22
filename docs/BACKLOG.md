@@ -3,131 +3,8 @@
 Rules: do tasks in order; one task per session. Status: `todo` | `done` | `blocked` (see QUESTIONS).
 `run_loop.ps1` parses `### Txx — title` headings and the `Status:` line directly below. Keep that format.
 
-### T01 — App shell + test harness
-Status: done
-- `index.html` (dark, landscape-first, loads `css/app.css` and `js/*.js` as classic scripts), `css/app.css` with color/size tokens.
-- `js/` UMD stub module `app-info.js` exporting `{ name, version }`.
-AC:
-- `node --test "tests/*.test.js"` runs and passes, including `tests/smoke.test.js` that requires `js/app-info.js`.
-- No `http://`/`https://`/`//cdn` references in `index.html`, `css/`, `js/` (test enforces).
-- Opening via a static server shows title + "No routine loaded" with no console errors.
-
-### T02 — Routine validator + expansion
-Status: done
-- `js/routine.js`: `validateRoutine(obj) -> { ok, errors[], warnings[] }`, `stepDuration(step, defaults)`, `expand(routine) -> flatSteps[]`, `totalDuration(routine)` per SPEC §3 (schema v2: blocks, rounds, restBetweenRounds, secPerRep, perSide).
-AC:
-- Validation tests: valid routine; missing name; bad type; both/neither reps & seconds; pause with reps; exercise cues ≠ 3; cue > 30 chars; pause without cues is OK; bad `secPerRep`; bad `rounds`/`restBetweenRounds`; empty block; bad clip path (`http:`, `//`, `..`); unknown field → warning only.
-- Errors name block/step index and field (e.g. `blocks[1].steps[2].cues: expected 3`).
-- Duration tests: reps default 3 s; custom `secPerRep` (TGU 3/side × 20 s = 120 s); `perSide` doubles reps and seconds steps.
-- Expansion tests: rounds repeated; `Rest` inserted between rounds but not after the last; flat steps carry block/round/rounds/durationSec.
-
-### T03 — Routine registry + demo routine
-Status: done
-- `routines/index.json`, `routines/demo.json` (short schema-v2 routine: 1 block × 2 rounds, 3 steps, ~10 s steps, uses `perSide` once, for testing).
-- Test: every `routines/*.json` (except index) is valid AND listed in `index.json`; every listed file exists.
-AC:
-- Adding an unlisted routine file makes the test fail with a clear message.
-
-### T04 — Timer engine (pure, fully automatic)
-Status: done
-- `js/engine.js`: state machine over expanded flat steps. API: `create(flatSteps, opts)`, `start(nowMs)`, `tick(nowMs)`, `togglePause(nowMs)`, `skip(nowMs)`, `back(nowMs)`, `getState()`. Events: `step`, `beep` (3/2/1), `final-beep`, `finished`.
-- Phases: `idle` → `ready` (5 s) → steps → `finished`. Every step timed by `durationSec`; auto-advance at 0. No API waits for "done".
-AC:
-- Tests with fake clock: auto-advances through all steps with zero input; countdown uses time deltas (one big tick jump crosses steps correctly); pause/resume preserves remaining; skip; back rule (> 3 s restarts, else previous; at step 0 restarts); skip/back while paused stay paused; beeps fire exactly once each at 3,2,1 and final at 0; no beeps while paused; `finished` with total elapsed.
-
-### T05 — Key mapping (pure)
-Status: done
-- `js/keys.js`: `mapKey(keyOrCode, screen) -> 'start'|'toggle'|'skip'|'back'|'up'|'down'|null` per SPEC §5 table. Screens: `picker`, `run`, `done`.
-AC:
-- Tests for every row/column in SPEC §5 incl. media keys; unmapped keys → null; no exit/menu action exists during a run.
-
-### T06 — View-model (pure)
-Status: done
-- `js/view.js`: `toView(engineState) -> { title, badge, countdown, target, blockLabel, index, nextUp, cues[], cuesFor: 'current'|'next', clip, theme, paused }`.
-AC:
-- Tests: exercise shows own cues; pause shows NEXT step name + target + cues; reps target `×10`, perSide `×10 / side`, seconds steps no target; countdown `m:ss` when ≥ 60 else `ss`; blockLabel `Block A · round 2/3`; last step nextUp = "Finish"; paused flag.
-
-### T07 — Run screen UI wiring (tap-first)
-Status: done
-- `js/app.js`: picker (routine cards from `routines/index.json`: name, weight, total duration; invalid ones disabled with error), DOM rendering of the view-model, `requestAnimationFrame` loop calling `engine.tick`.
-- Tap controls are primary: bottom bar `◀ Back` · `⏯ Pause/Resume` · `▶ Skip` (sizes per SPEC §5), routine cards tappable = Start. Keyboard/remote via `keys.js` as secondary. "PAUSED" overlay. End screen with "Back to routines".
-- CSS per SPEC §6 (viewport units, exercise vs rest accent).
-AC:
-- Test (static): `index.html` contains every element ID `app.js` uses; the three control buttons exist with accessible labels.
-- Manual (in self-audit): demo routine runs start→finish with ONE tap and no further input; pause/skip/back work by tap and by keyboard.
-
-### T08 — Beeps (WebAudio)
-Status: done
-- `js/audio.js`: `createBeeper(AudioContextCtor)`; `unlock()`, `beep()` (~880 Hz, 120 ms), `finalBeep()` (~1320 Hz, 400 ms). Wired to engine events; `unlock()` on Start tap.
-AC:
-- Tests with a mock AudioContext: correct frequencies/durations scheduled; no throw when AudioContext missing.
-
-### T09 — Fullscreen + Wake Lock
-Status: done
-- `js/screen.js`: enter fullscreen on Start; wake lock acquire on Start, release on finish, re-acquire on `visibilitychange`.
-AC:
-- Tests with mocked `document`/`navigator`: acquire/release/re-acquire calls; graceful when APIs absent.
-
-### T10 — Optional exercise clips
-Status: done
-- Show `<video muted loop playsinline>` for current (or next, during pause) step's clip; hide on error/missing.
-AC:
-- View-model test: clip chosen correctly for exercise vs pause. Manual: missing clip path shows no broken element.
-
-### T11 — PWA: manifest, icons, service worker
-Status: done
-- `manifest.webmanifest`, `icons/` (192, 512, maskable; generated locally), `sw.js` with `CACHE_VERSION`, precache list, cache-first, old cache cleanup, skipWaiting/clientsClaim. Register SW in `app.js`.
-- Precache = static `APP_SHELL` array + runtime fetch of `routines/index.json` (routines + their clips).
-AC:
-- Test: every file under `index.html`, `css/`, `js/`, `icons/`, manifest is in `APP_SHELL` (no missing, no stale entries).
-- Manual: load once, go offline (DevTools), reload → app + routines work.
-
-### T12 — Release/versioning check + README
-Status: done
-- `tests/release.test.js`: `CACHE_VERSION` in `sw.js` equals the top released version in CHANGELOG.
-- `README.md`: run locally (any static server, e.g. `python -m http.server`), deploy on GitHub Pages (Settings → Pages → main / root), how to add a routine.
-AC:
-- Test fails if CHANGELOG version and `CACHE_VERSION` differ.
-
-### T13 — First real routine: KB 60 min core + full body
-Status: done
-- Move `docs/routine-drafts/kb-60-core-full-body.json` (content approved by user, Q01) to `routines/`, register in `routines/index.json`. Fix only schema issues; do not change exercises, reps, timings, or cues without a QUESTIONS entry.
-AC:
-- Validates with T02; listed in index; T03 registry test passes.
-- Test: expanded total duration = 3531 s (≈ 58.9 min) and 78 flat steps (incl. generated round rests); block order Warm-up, Block A, Transition, Block B, Cool-down.
-
-### T14 — TV readability + end-to-end pass
-Status: done
-- Review sizes/contrast on 1920×1080, 1280×720, phone landscape + portrait; long names/cues shrink or ellipsize.
-- Simulated full-run test: engine through the KB 60 routine with fake clock and zero input, assert event sequence and finish time.
-AC:
-- Contrast of main text/background tokens ≥ 7:1 (test computes from CSS tokens).
-- E2E simulation test passes.
-
-### T15 — Rest screen target + TV-readable secondary text
-Status: done
-- During rest/get-ready, the big countdown has NO target beside it; the next exercise's target shows only in the "Next: <name> ×N" line, which is enlarged. Enlarge status line and "NEXT UP" per SPEC §4/§6.
-- Found in browser check: rest showed "13 ×10" (target looked like part of the rest); status line was 3vh, NEXT UP 3.5vh.
-AC:
-- View-model test: for a pause or get-ready state the countdown-side target is empty and the next exercise's target is exposed separately (e.g. `nextTarget`); exercise steps unchanged.
-- CSS test (from tokens/rules): "Next:" line ≥ 7vh, status line ≥ 4.5vh, NEXT UP ≥ 5vh; existing countdown/name/cue minimums still hold.
-- Portrait phone (375×812) still fits without overlapping the control bar (state checked in self-audit).
-
-### T16 — End screen total time format
-Status: done
-- Total time on the end screen shows `m:ss` (`0:58`, `58:51`), `h:mm:ss` from 1 h (`1:02:03`). Found in browser check: showed "Total time 1".
-AC:
-- Pure `formatTotal(sec)` (in `view.js`) tested for 0, 58, 60, 3531, 3723 s; end screen uses it (static test or view-model test).
-
-### T17 — Cleanup + release v2
-Status: done
-- `routines/demo.json`: drop `"weight": "none"`; picker card omits the weight part when a routine has no weight (shows only duration).
-- Delete `docs/routine-drafts/` (superseded by `routines/kb-60-core-full-body.json`).
-- Release: bump `CACHE_VERSION` in `sw.js` to `"v2"`, rename CHANGELOG `## Unreleased` to `## v2 (<date>)` and add a fresh empty `## Unreleased` above it.
-AC:
-- Test: picker card label for a routine without weight has no "none"/empty separator (pure helper tested).
-- `docs/routine-drafts/` no longer exists; nothing references it except history in QUESTIONS/BACKLOG.
-- Release test (T12) passes with v2.
+## Done T01–T17 (summary; full text and AC in git history before T22)
+- T01 app shell + test harness · T02 routine validator + expansion · T03 routine registry + demo · T04 timer engine · T05 key mapping · T06 view-model · T07 run screen UI · T08 beeps · T09 fullscreen + wake lock · T10 clips · T11 PWA/service worker · T12 release check + README · T13 KB 60 routine · T14 TV readability + E2E · T15 rest-screen target · T16 end-screen time format · T17 cleanup + v2.
 
 ### T18 — Adjustable rep pace (global sec/rep + per-exercise overrides)
 Status: done
@@ -175,3 +52,84 @@ AC:
 - Static CSS test (`tests/ui.test.js`): `#run-countdown` has a fixed width that does not depend on content (e.g. a `width`/`min-width` in `ch`, ≥ 4ch to fit `m:ss`; or an equivalent fixed grid track for the countdown) and keeps `font-variant-numeric: tabular-nums`; existing size tests (countdown ≥ 30vh, media ≥ 25vh) still pass.
 - Release test passes with `v8` in both files.
 - Self-audit: explain why the media x-position no longer depends on the countdown text (1-digit, 2-digit, `m:ss`), and that nothing overflows at 1280×720 and 375×812.
+
+### T22 — Published routine changes reach every device
+Status: todo
+- User change 4 (D39). Today `sw.js` serves `routines/*` cache-first, so a routine added/renamed on GitHub is invisible to phones that already opened the app until a release. SPEC §7.
+- `sw.js` fetch: requests whose path is under `routines/` (index.json + routine files) are **network-first**: fetch from network; on success put the response in the current cache and return it; on network error or non-ok response return the cached copy; if neither exists, return the network response/error. Everything else (app shell, clips) stays cache-first. Install-time precache unchanged.
+AC:
+- `tests/pwa.test.js` (vm sandbox, mocked `fetch`/`caches`): for `routines/index.json` the network copy wins over a cached copy and is written to the cache; with the network failing, the cached copy is returned; for `clips/x.webp` and `js/app.js` a cached copy is returned without calling `fetch`.
+- All existing tests pass (APP_SHELL unchanged).
+
+### T23 — Owner mode (PIN)
+Status: todo
+- User change 4 (D40, D41). SPEC §4b. Hides edit controls from everyone but the owner. NOT security: the real protection is that only the owner can push to GitHub.
+- New pure UMD module `js/owner.js` (global `Owner`; add to `index.html` before `app.js` and to `APP_SHELL`): `sha256Hex(str)` (pure JS, synchronous, UTF-8, no WebCrypto), `hashPin(pin)` = `sha256Hex('training-assistant:' + pin)`, `checkPin(pin, hash)` (false when hash is empty/invalid).
+- New `js/owner-config.js` (UMD, global `OwnerConfig = { pinHash: '' }`; in `index.html` + `APP_SHELL`). Empty hash = owner mode cannot be unlocked (panel shows "No PIN set").
+- New `tools/set-pin.js` (Node, run by the owner locally): asks for the PIN twice on stdin (never via argv), requires 4–12 digits, rewrites `js/owner-config.js` with the hash, prints next steps (commit + push). Never prints or stores the PIN itself. Exports its pure helpers (`validPin`, `configText`) and only prompts when run as main.
+- Picker: small "Owner" button below `#app-version`. Tap → inline panel `#owner-panel` with a password input (`inputmode="numeric"`), "Unlock" and "Cancel". Correct PIN → owner mode on, stored in localStorage `kb-timer-owner` = the hash (owner mode is on only while the stored value === `OwnerConfig.pinHash`, so a new PIN re-locks old devices). Wrong PIN → "Wrong PIN", stays locked. When unlocked the button reads "Lock" and turns owner mode off. Storage read/write in try/catch.
+- `#app` gets `data-owner="on"|"off"`; T24–T27 controls show only when on.
+- The `keydown` handler ignores events whose target is an `input`, `textarea` or `select` (typing a PIN + Enter must not start a routine). Key mapping (D18) unchanged.
+AC:
+- `tests/owner.test.js`: `sha256Hex('')` and `sha256Hex('abc')` equal the standard SHA-256 test vectors and equal Node `crypto` for several strings incl. non-ASCII; `checkPin` true for the right PIN, false for a wrong PIN and for an empty hash.
+- `tools/set-pin.js` helpers: `configText(hash)` is valid JS that sets `OwnerConfig.pinHash` (load it in a `vm` sandbox); `validPin` rejects `123`, `abcd`, 13 digits and accepts `1234`.
+- Static UI test: owner element IDs used by `app.js` exist in `index.html`; `js/owner.js` and `js/owner-config.js` are loaded by `index.html` (before `app.js`) and are in `APP_SHELL`; `app.js` keydown handler has the form-field guard.
+- Self-audit: in the browser (with a temporary local hash, not committed), wrong PIN stays locked; right PIN unlocks and survives reload; Lock turns it off; Enter in the PIN field does not start a routine. Commit `js/owner-config.js` with an EMPTY hash.
+
+### T24 — Owner: rename and remove routines (unpublished drafts)
+Status: todo
+- User change 4 (D42). SPEC §4b.
+- New pure UMD module `js/drafts.js` (global `Drafts`; in `index.html` + `APP_SHELL`). Drafts = `{ routines: { "<file>": routineObj }, removed: ["<file>"] }`. Functions: `normalize(obj)`; `rename(drafts, file, baseRoutine, newName)` (stores a copy of the routine with only `name` changed, trimmed; blank → error); `remove(drafts, file)`; `undo(drafts, file)` (drops that file's draft and removal); `apply(entries, drafts)` → entries with draft routines replacing loaded ones (`unpublished: true`), removed ones `removed: true`, and draft-only files (new routines, T26) appended; `isEmpty(drafts)`. All pure, inputs never mutated.
+- Saved in localStorage `kb-timer-drafts` (try/catch). Drafts are applied ONLY while owner mode is on; other devices never see them.
+- Picker in owner mode: each routine card gets "Rename" and "Remove" buttons (tap only, outside the card's Start button, blur after tap). Rename = inline text input + Save/Cancel (Enter in the input saves, never starts a routine). Removed cards stay listed, greyed, "Removed — unpublished", with "Undo", and cannot be started (keyboard selection skips them). Changed cards show an "unpublished" tag. Rename changes only the display `name`; file name and `id` stay (D42).
+AC:
+- `tests/drafts.test.js`: rename keeps every field except `name` identical and does not mutate the input; blank name rejected; remove + undo; `apply` marks unpublished/removed and appends draft-only files; `normalize` drops garbage.
+- Static UI test: new IDs used by `app.js` exist in `index.html`; `js/drafts.js` in `index.html` + `APP_SHELL`.
+- Self-audit: in owner mode rename a routine → new name and same card total, survives reload; Remove + Undo; owner mode off → original names, no edit buttons.
+
+### T25 — Default exercise picture by name
+Status: todo
+- User change 4 (D43). SPEC §3 (clip), §4 (Picture), §7.
+- `Routine.clipName(name)`: lowercase; every run of characters other than `a–z0–9` → `-`; trim `-` at both ends (`Leg & hip stretch` → `leg-hip-stretch`, `Single-arm row` → `single-arm-row`).
+- An exercise step without `clip` gets an implicit picture: `clips/<clipName>.webp`, and if that fails to load, `clips/<clipName>.mp4`. An explicit `clip` always wins (no fallback). Pause steps never get implicit clips.
+- View-model: implicit clip media = `{ src: 'clips/<n>.webp', kind: 'image', fallback: { src: 'clips/<n>.mp4', kind: 'video' } }`; explicit clips unchanged (no `fallback`). `app.js renderMedia`: on image error with a fallback, try the fallback video; on its error hide (no broken element, no retry loop).
+- `sw.js precacheRoutines`: for exercise steps without `clip`, best-effort fetch of both convention paths (404 ignored, not cached).
+- Existing routines keep their explicit clips (no routine file changes); KB 60 totals unchanged.
+AC:
+- Routine tests for `clipName`: the examples above plus `Two-hand swing`, `  Farmer  carry `, `Halo`.
+- View tests: next exercise without clip → webp media with mp4 fallback; explicit clip → no fallback; get-ready → step 1's media; exercise steps → null (unchanged).
+- SW test (vm sandbox): precache requests both convention paths for a step without `clip` and does not fail when they 404.
+- Self-audit: in the browser, a step named like an existing clip but without `clip` shows the picture; an unknown name shows nothing and no repeated errors.
+
+### T26 — Owner: import a routine from a table
+Status: todo
+- User change 4 (D44). SPEC §4b, §4c (table format).
+- New pure UMD module `js/import.js` (global `Import`; in `index.html` + `APP_SHELL`):
+  - `COLUMNS` = the SPEC §4c column list; `CHAT_PROMPT` = the Claude Chat prompt text from SPEC §4c (lists the same columns).
+  - `parseTable(text)` → `{ header[], rows[][], errors[], warnings[] }`. Accepts a Markdown pipe table (separator row ignored, outer pipes optional) or tab-separated text (copied from a chat or spreadsheet); text before/after the table is ignored. Header matched case-insensitively, extra spaces ignored; unknown columns → warning; missing required column → error.
+  - `toRoutine(parsed, { name, weight })` → `{ routine, errors[], warnings[] }` per SPEC §4c rules, `id` = `Routine.clipName(name)`, then `Routine.validateRoutine`. Every table error names the data row (1 = first data row) and column, e.g. `row 4, Reps: expected whole number`.
+  - `fileName(id, existingFiles)` → `<id>.json`, or `<id>-2.json`, `-3`… if taken.
+- Picker in owner mode: "Import routine" button → panel `#import-panel`: Name (required), Weight (optional), a large textarea for the table, "Copy prompt for Claude Chat" (copies `CHAT_PROMPT`; if clipboard fails, shows it selectable), "Check". Check shows errors, or a preview (blocks with rounds, steps with target, total via `Routine.totalDuration`) plus a picture list: each distinct exercise with its expected file `clips/<clipName>.webp` / `.mp4` and ✓ found / ✗ missing (load test with an `Image`/`video` element; "?" when it cannot be checked). "Add" (enabled only when valid) stores it as a draft-only routine via `Drafts` (T24) and closes the panel; the card appears with "unpublished".
+- Enter/Space inside the panel never start a routine (T23 guard).
+AC:
+- `tests/import.test.js`: Markdown and TSV versions of the same table give the same routine; the SPEC §4c example table validates and its `totalDuration` and step count match a hand-computed value; a table equivalent to `routines/demo.json` (minus clips) gives the same `totalDuration`; block grouping with blank Block cells; pause/rest; per-side values; errors carry row + column (bad reps, both reps and seconds, missing cues for an exercise, unknown type, missing required column); `fileName` collisions; every `COLUMNS` entry appears in `CHAT_PROMPT`.
+- Static UI test: import panel IDs used by `app.js` exist; `js/import.js` in `index.html` + `APP_SHELL`.
+- Self-audit: paste the SPEC §4c example on phone portrait and at 1280×720 → Check shows preview + total; Add → new card with unpublished tag; it starts and runs.
+
+### T27 — Owner: publish changes + docs
+Status: todo
+- User change 4 (D45). SPEC §4b, README.
+- `Drafts.publishFiles(entries, drafts)` (pure) → `[{ file, text }]`: one file per new or renamed routine (`JSON.stringify(routine, null, 2)` + newline) and `index.json` = published order minus removed files, plus new files appended (`{ "routines": [...] }`, 2-space indent).
+- Picker in owner mode, when drafts are not empty: "Publish (N changes)" → panel `#publish-panel` listing each file with a "Download" button (Blob + `<a download>`), the steps ("Upload all files to the `routines/` folder on github.com → Commit changes. Everyone sees it next time they open the app.") and "Mark as published" (clears drafts after a confirm). No network calls.
+- Docs: README "Add a routine" rewritten for the owner flow (Claude Chat prompt → Import → Publish → upload on GitHub; manual JSON route kept short); new "Exercise pictures" section (naming rule from SPEC §3 with examples, upload to `clips/`); new "Owner PIN" section (`node tools/set-pin.js`, commit + push; PIN only hides controls). New `docs/ROUTINE-PROMPT.md` = the Claude Chat prompt (same text as `Import.CHAT_PROMPT`).
+AC:
+- `tests/drafts.test.js`: publish files for rename-only, remove-only, new-only and mixed drafts; `index.json` order rule; every routine file text parses and validates with `Routine.validateRoutine`; file names are lowercase-kebab `.json`.
+- `tests/docs.test.js`: `docs/ROUTINE-PROMPT.md` contains `Import.CHAT_PROMPT` verbatim.
+- Static UI test: publish panel IDs exist.
+- Self-audit: download the files in Chrome and show the `index.json` content for a mixed draft.
+
+### T28 — Release v10
+Status: todo
+- Bump `CACHE_VERSION` in `sw.js` and `version` in `js/app-info.js` to `v10`; CHANGELOG `## Unreleased` → `## v10 (date)` with a fresh empty `## Unreleased` above.
+AC:
+- Release tests pass with `v10`.
