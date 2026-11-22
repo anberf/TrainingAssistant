@@ -108,6 +108,43 @@ test('routines: no cache and non-ok -> network response; no cache and error -> r
   await assert.rejects(runFetch('https://x.test/routines/a.json', { net: new Error('off'), cached: undefined }).p);
 });
 
+// ---- T25: precache convention paths for exercises without clip ----
+test('precache requests webp+mp4 for a step without clip; 404s are ignored', async () => {
+  const src = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  const listeners = {};
+  const fetched = [], put = [];
+  const routine = { blocks: [{ steps: [
+    { name: 'Leg & hip stretch', type: 'exercise' },
+    { name: 'Rest', type: 'pause' },
+    { name: 'Halo', type: 'exercise', clip: 'clips/halo.svg' },
+  ] }] };
+  const json = (o) => ({ ok: true, clone() { return this; }, json: async () => o });
+  const cache = { put: async (k) => { put.push(k); }, addAll: async () => {} };
+  const sandbox = {
+    URL,
+    self: { addEventListener: (t, fn) => { listeners[t] = fn; }, skipWaiting: async () => {} },
+    fetch: async (u) => {
+      fetched.push(u);
+      if (u === 'routines/index.json') return json({ routines: ['a.json'] });
+      if (u === 'routines/a.json') return json(routine);
+      if (u === 'clips/halo.svg') return { ok: true };
+      return { ok: false, status: 404 };
+    },
+    caches: { open: async () => cache },
+  };
+  vm.createContext(sandbox);
+  vm.runInContext(src, sandbox);
+  let p;
+  listeners.install({ waitUntil: (x) => { p = x; } });
+  await p;
+  assert.ok(fetched.includes('clips/leg-hip-stretch.webp'));
+  assert.ok(fetched.includes('clips/leg-hip-stretch.mp4'));
+  assert.ok(!fetched.some((u) => /clips\/rest\./.test(u)), 'pause gets no implicit clip');
+  assert.ok(!fetched.includes('clips/halo.webp'), 'explicit clip: no convention paths');
+  assert.ok(!put.includes('clips/leg-hip-stretch.webp'), '404 not cached');
+  assert.ok(put.includes('clips/halo.svg'));
+});
+
 test('clips and app shell stay cache-first (no fetch when cached)', async () => {
   for (const u of ['https://x.test/app/clips/x.webp', 'https://x.test/app/js/app.js']) {
     const cached = resp('cached');

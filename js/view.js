@@ -25,8 +25,19 @@
 
   var VIDEO_EXTS = ['mp4', 'webm'];
   // Picture shown beside the rest/get-ready countdown: { src, kind } or null.
+  // Exercise without `clip`: clips/<clip-name>.webp, falling back to .mp4 (D43).
+  // Same rule as Routine.clipName (kept local so View stays dependency-free).
+  function clipName(name) {
+    return String(name === undefined || name === null ? '' : name).toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
   function mediaFor(step) {
-    if (!step || typeof step.clip !== 'string' || !step.clip) return null;
+    if (!step) return null;
+    if (typeof step.clip !== 'string' || !step.clip) {
+      var n = step.type === 'pause' ? '' : clipName(step.name);
+      if (!n) return null;
+      return { src: 'clips/' + n + '.webp', kind: 'image', fallback: { src: 'clips/' + n + '.mp4', kind: 'video' } };
+    }
     var m = /\.([a-z0-9]+)$/i.exec(step.clip.split(/[?#]/)[0]);
     return { src: step.clip, kind: m && VIDEO_EXTS.indexOf(m[1].toLowerCase()) !== -1 ? 'video' : 'image' };
   }

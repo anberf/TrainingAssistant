@@ -38,11 +38,20 @@ async function precacheRoutines(cache) {
       const r = await res.json();
       for (const b of (r.blocks || [])) {
         for (const s of (b.steps || [])) {
-          if (!s || !s.clip) continue;
-          try {
-            const cr = await fetch(s.clip, { cache: 'reload' });
-            if (cr.ok) await cache.put(s.clip, cr);
-          } catch (e) { /* clips are optional */ }
+          if (!s) continue;
+          let paths = [];
+          if (s.clip) paths = [s.clip];
+          else if (s.type !== 'pause') {
+            // Default pictures by name (D43): clips/<clip-name>.webp / .mp4, best effort.
+            const n = String(s.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            if (n) paths = ['clips/' + n + '.webp', 'clips/' + n + '.mp4'];
+          }
+          for (const p of paths) {
+            try {
+              const cr = await fetch(p, { cache: 'reload' });
+              if (cr.ok) await cache.put(p, cr);
+            } catch (e) { /* clips are optional */ }
+          }
         }
       }
     } catch (e) { /* skip bad routine */ }

@@ -279,6 +279,7 @@
   function renderMedia(media) {
     var src = media ? media.src : '';
     var kind = media ? media.kind : '';
+    var fb = media && media.fallback ? media.fallback : null;
     var key = kind + ':' + src;
     if (cache.media === key) return;
     cache.media = key;
@@ -290,16 +291,25 @@
     if (!src) return;
     if (kind === 'image') {
       img.onload = function () { if (cache.media === key) img.hidden = false; };
-      img.onerror = function () { img.hidden = true; };
+      img.onerror = function () {
+        img.hidden = true;
+        img.onerror = null; // no retry loop
+        if (fb && fb.kind === 'video' && cache.media === key) startVideo(fb.src, key);
+      };
       img.src = src;
     } else {
-      vid.onloadeddata = function () { if (cache.media === key) vid.hidden = false; };
-      vid.onerror = function () { vid.hidden = true; };
-      vid.muted = true;
-      vid.src = src;
-      var p = vid.play();
-      if (p && p.catch) p.catch(function () {});
+      startVideo(src, key);
     }
+  }
+
+  function startVideo(src, key) {
+    var vid = $('run-clip');
+    vid.onloadeddata = function () { if (cache.media === key) vid.hidden = false; };
+    vid.onerror = function () { vid.hidden = true; vid.onerror = null; };
+    vid.muted = true;
+    vid.src = src;
+    var p = vid.play();
+    if (p && p.catch) p.catch(function () {});
   }
 
   function render() {

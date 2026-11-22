@@ -88,7 +88,7 @@ AC:
 - Self-audit: in owner mode rename a routine → new name and same card total, survives reload; Remove + Undo; owner mode off → original names, no edit buttons.
 
 ### T25 — Default exercise picture by name
-Status: todo
+Status: done
 - User change 4 (D43). SPEC §3 (clip), §4 (Picture), §7.
 - `Routine.clipName(name)`: lowercase; every run of characters other than `a–z0–9` → `-`; trim `-` at both ends (`Leg & hip stretch` → `leg-hip-stretch`, `Single-arm row` → `single-arm-row`).
 - An exercise step without `clip` gets an implicit picture: `clips/<clipName>.webp`, and if that fails to load, `clips/<clipName>.mp4`. An explicit `clip` always wins (no fallback). Pause steps never get implicit clips.

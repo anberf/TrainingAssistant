@@ -123,6 +123,12 @@
     return step.seconds * mult;
   }
 
+  // Picture file stem for an exercise name (D43): 'Leg & hip stretch' -> 'leg-hip-stretch'.
+  function clipName(name) {
+    return String(name === undefined || name === null ? '' : name).toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+
   // Assumes a valid routine.
   function expand(routine, pace) {
     var out = [];
@@ -165,6 +171,7 @@
     DEFAULT_SEC_PER_REP: DEFAULT_SEC_PER_REP,
     validateRoutine: validateRoutine,
     stepDuration: stepDuration,
+    clipName: clipName,
     expand: expand,
     totalDuration: totalDuration
   };

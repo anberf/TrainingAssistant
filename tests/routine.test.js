@@ -124,6 +124,13 @@ test('no rest when restBetweenRounds 0 or single round; defaults', () => {
   const r3 = { name: 'n', blocks: [{ name: 'b', steps: [{ name: 'e', type: 'exercise', reps: 2, cues }] }] };
   assert.strictEqual(R.expand(r3)[0].durationSec, 6);
 });
+test('T25 clipName: lowercase kebab of a-z0-9 runs', () => {
+  assert.strictEqual(R.clipName('Leg & hip stretch'), 'leg-hip-stretch');
+  assert.strictEqual(R.clipName('Single-arm row'), 'single-arm-row');
+  assert.strictEqual(R.clipName('Two-hand swing'), 'two-hand-swing');
+  assert.strictEqual(R.clipName('  Farmer  carry '), 'farmer-carry');
+  assert.strictEqual(R.clipName('Halo'), 'halo');
+});
 test('totalDuration', () => {
   assert.strictEqual(R.totalDuration(good()), 245 * 3 + 240); // 45+20+120+60 per round
 });

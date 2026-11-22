@@ -61,12 +61,26 @@ test('T19 media: rest -> next exercise picture with kind; get-ready -> step 1; e
   const st = (step, next) => ({ phase: 'step', paused: false, index: 0, total: 3, step, next, remainingSec: 5 });
   assert.deepStrictEqual(toView(st(rest, nxt)).media, { src: 'clips/b.svg', kind: 'image' });
   assert.deepStrictEqual(toView(st(rest, vid)).media, { src: 'clips/v.WEBM', kind: 'video' });
-  assert.strictEqual(toView(st(rest, none)).media, null);
   assert.strictEqual(toView(st(rest, null)).media, null);
   assert.strictEqual(toView(st(own, nxt)).media, null);
   assert.strictEqual(toView(st(own, none)).media, null);
   const ready = toView({ phase: 'ready', paused: false, total: 3, step: null, next: own, remainingSec: 5 });
   assert.deepStrictEqual(ready.media, { src: 'clips/a.svg', kind: 'image' });
+});
+test('T25 implicit media: no clip -> webp with mp4 fallback; explicit -> no fallback', () => {
+  const none = { name: 'Leg & hip stretch', type: 'exercise', durationSec: 30, cues: cues('c') };
+  const own = { name: 'A', type: 'exercise', durationSec: 30, cues: cues('a'), clip: 'clips/a.svg' };
+  const rest = { name: 'Rest', type: 'pause', durationSec: 10, cues: [] };
+  const st = (step, next) => ({ phase: 'step', paused: false, index: 0, total: 3, step, next, remainingSec: 5 });
+  const implicit = {
+    src: 'clips/leg-hip-stretch.webp', kind: 'image',
+    fallback: { src: 'clips/leg-hip-stretch.mp4', kind: 'video' }
+  };
+  assert.deepStrictEqual(toView(st(rest, none)).media, implicit);
+  assert.deepStrictEqual(toView({ phase: 'ready', paused: false, total: 3, step: null, next: none, remainingSec: 5 }).media, implicit);
+  assert.strictEqual('fallback' in toView(st(rest, own)).media, false);
+  assert.strictEqual(toView(st(none, own)).media, null); // exercise step: no media
+  assert.strictEqual(toView(st(rest, rest)).media, null); // pause never gets an implicit clip
 });
 test('countdown format', () => {
   assert.strictEqual(formatCountdown(59), '59');
