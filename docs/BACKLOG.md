@@ -102,7 +102,7 @@ AC:
 - Self-audit: in the browser, a step named like an existing clip but without `clip` shows the picture; an unknown name shows nothing and no repeated errors.
 
 ### T26 — Owner: import a routine from a table
-Status: todo
+Status: done
 - User change 4 (D44). SPEC §4b, §4c (table format).
 - New pure UMD module `js/import.js` (global `Import`; in `index.html` + `APP_SHELL`):
   - `COLUMNS` = the SPEC §4c column list; `CHAT_PROMPT` = the Claude Chat prompt text from SPEC §4c (lists the same columns).

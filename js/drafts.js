@@ -39,6 +39,16 @@
     return { drafts: d, error: null };
   }
 
+  // Stores a draft-only (new) routine under `file` (T26). Returns the new drafts; input never mutated.
+  function add(drafts, file, routine) {
+    var d = normalize(drafts);
+    if (file && isObj(routine)) {
+      d.routines[file] = clone(routine);
+      d.removed = d.removed.filter(function (f) { return f !== file; });
+    }
+    return d;
+  }
+
   function remove(drafts, file) {
     var d = normalize(drafts);
     if (file && d.removed.indexOf(file) === -1) d.removed.push(file);
@@ -80,5 +90,5 @@
     return out;
   }
 
-  return { normalize: normalize, rename: rename, remove: remove, undo: undo, apply: apply, isEmpty: isEmpty };
+  return { normalize: normalize, rename: rename, add: add, remove: remove, undo: undo, apply: apply, isEmpty: isEmpty };
 });

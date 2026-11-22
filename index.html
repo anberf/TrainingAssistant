@@ -33,6 +33,24 @@
         <button id="owner-cancel" type="button">Cancel</button>
         <p id="owner-msg"></p>
       </div>
+      <button id="import-btn" type="button" hidden>Import routine</button>
+      <div id="import-panel" hidden>
+        <label class="import-label" for="import-name">Name (required)</label>
+        <input id="import-name" type="text" maxlength="60" autocomplete="off">
+        <label class="import-label" for="import-weight">Weight (optional)</label>
+        <input id="import-weight" type="text" maxlength="20" autocomplete="off">
+        <label class="import-label" for="import-text">Table (Markdown or tab-separated)</label>
+        <textarea id="import-text" rows="10" spellcheck="false"></textarea>
+        <div class="import-actions">
+          <button id="import-copy" type="button">Copy prompt for Claude Chat</button>
+          <button id="import-check" type="button">Check</button>
+          <button id="import-add" type="button" disabled>Add</button>
+          <button id="import-cancel" type="button">Cancel</button>
+        </div>
+        <textarea id="import-prompt" rows="6" readonly hidden aria-label="Prompt for Claude Chat"></textarea>
+        <p id="import-msg"></p>
+        <div id="import-result"></div>
+      </div>
     </section>
 
     <section id="screen-run" class="screen" hidden>
@@ -73,6 +91,7 @@
   <script src="js/owner.js"></script>
   <script src="js/owner-config.js"></script>
   <script src="js/drafts.js"></script>
+  <script src="js/import.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/keys.js"></script>
   <script src="js/view.js"></script>

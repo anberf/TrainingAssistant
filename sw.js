@@ -12,6 +12,7 @@ const APP_SHELL = [
   'js/audio.js',
   'js/drafts.js',
   'js/engine.js',
+  'js/import.js',
   'js/keys.js',
   'js/owner-config.js',
   'js/owner.js',

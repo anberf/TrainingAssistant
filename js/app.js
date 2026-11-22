@@ -389,6 +389,8 @@
     app.setAttribute('data-owner', ownerOn ? 'on' : 'off');
     $('owner-btn').textContent = ownerOn ? 'Lock' : 'Owner';
     if (ownerOn) $('owner-panel').hidden = true;
+    $('import-btn').hidden = !ownerOn;
+    if (!ownerOn) closeImport();
     renamingFile = null;
     refresh();
   }
@@ -428,6 +430,119 @@
   $('owner-pin').addEventListener('keydown', function (ev) {
     if (ev.key === 'Enter') { ev.preventDefault(); tryUnlock(); }
   });
+  // ---- Import a routine from a table (SPEC 4c, D44) ----
+  var candidate = null; // { routine } once Check succeeded; cleared on any edit
+  var chatPrompt = Import.CHAT_PROMPT;
+
+  function closeImport() {
+    $('import-panel').hidden = true;
+    ['import-name', 'import-weight', 'import-text'].forEach(function (id) { $(id).value = ''; });
+    $('import-prompt').hidden = true;
+    $('import-msg').textContent = '';
+    $('import-result').textContent = '';
+    $('import-add').disabled = true;
+    candidate = null;
+  }
+  function invalidateCandidate() {
+    candidate = null;
+    $('import-add').disabled = true;
+  }
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+  function listOf(items, cls) {
+    var ul = el('ul', cls);
+    items.forEach(function (t) { ul.appendChild(el('li', '', t)); });
+    return ul;
+  }
+
+  // Try the picture files like the run screen does: webp image, then mp4 video. Calls done('found'|'missing'|'unknown').
+  function probePicture(pic, done) {
+    if (typeof Image === 'undefined') { done('unknown'); return; }
+    var img = new Image();
+    img.onload = function () { done('found'); };
+    img.onerror = function () {
+      var v = document.createElement('video');
+      if (!v || typeof v.load !== 'function') { done('unknown'); return; }
+      v.preload = 'metadata';
+      v.onloadedmetadata = function () { v.removeAttribute('src'); v.load(); done('found'); };
+      v.onerror = function () { done('missing'); };
+      v.src = pic.mp4;
+    };
+    img.src = pic.webp;
+  }
+
+  function renderPreview(box, routine) {
+    var pv = Import.preview(routine, pace);
+    box.appendChild(el('p', 'import-total', pv.stepCount + ' steps · total ' + View.formatTotal(pv.total)));
+    pv.blocks.forEach(function (b) {
+      box.appendChild(el('h3', 'import-block', b.name + ' · ' + b.rounds + (b.rounds === 1 ? ' round' : ' rounds') +
+        (b.rounds > 1 && b.rest ? ' · rest ' + b.rest + ' s' : '')));
+      box.appendChild(listOf(b.steps.map(function (s) { return s.name + (s.type === 'pause' ? ' (pause)' : '') + ' — ' + s.target; })));
+    });
+    if (pv.pictures.length) {
+      box.appendChild(el('h3', 'import-block', 'Pictures'));
+      var ul = el('ul', 'import-pics');
+      pv.pictures.forEach(function (p) {
+        var li = el('li', '', '? ' + p.name + ' — ' + p.webp + ' / ' + p.mp4);
+        ul.appendChild(li);
+        probePicture(p, function (st) {
+          var mark = st === 'found' ? '✓' : st === 'missing' ? '✗' : '?';
+          li.textContent = mark + ' ' + p.name + ' — ' + p.webp + ' / ' + p.mp4 + (st === 'missing' ? ' (missing)' : '');
+          li.className = st;
+        });
+      });
+      box.appendChild(ul);
+    }
+  }
+
+  function checkImport() {
+    var box = $('import-result');
+    box.textContent = '';
+    invalidateCandidate();
+    var parsed = Import.parseTable($('import-text').value);
+    var res = Import.toRoutine(parsed, { name: $('import-name').value, weight: $('import-weight').value });
+    if (res.errors.length) {
+      $('import-msg').textContent = 'Fix these ' + res.errors.length + ' problem(s):';
+      box.appendChild(listOf(res.errors, 'import-errors'));
+      return;
+    }
+    $('import-msg').textContent = 'Looks good.';
+    if (res.warnings.length) box.appendChild(listOf(res.warnings, 'import-warnings'));
+    renderPreview(box, res.routine);
+    candidate = { routine: res.routine };
+    $('import-add').disabled = false;
+  }
+  function addImport() {
+    if (!candidate) return;
+    var files = baseEntries.map(function (e) { return e.file; }).concat(Object.keys(drafts.routines));
+    var file = Import.fileName(candidate.routine.id, files);
+    saveDrafts(Drafts.add(drafts, file, candidate.routine));
+    closeImport();
+    refresh();
+  }
+  function copyPrompt() {
+    var p = $('import-prompt');
+    p.value = chatPrompt;
+    var showIt = function () { p.hidden = false; p.focus(); p.select(); $('import-msg').textContent = 'Copy the prompt below.'; };
+    try {
+      navigator.clipboard.writeText(chatPrompt).then(function () {
+        $('import-msg').textContent = 'Prompt copied.';
+      }, showIt);
+    } catch (e) { showIt(); }
+  }
+  $('import-btn').addEventListener('click', function () {
+    $('import-btn').blur();
+    var p = $('import-panel');
+    if (p.hidden) { p.hidden = false; $('import-name').focus(); } else closeImport();
+  });
+  [['import-copy', copyPrompt], ['import-check', checkImport], ['import-add', addImport], ['import-cancel', closeImport]]
+    .forEach(function (x) { $(x[0]).addEventListener('click', function () { $(x[0]).blur(); x[1](); }); });
+  ['import-name', 'import-weight', 'import-text'].forEach(function (id) { $(id).addEventListener('input', invalidateCandidate); });
+
   ownerOn = readOwner();
   renderOwner();
 
@@ -435,6 +550,7 @@
     if (ev.repeat) return;
     var tg = ev.target && ev.target.tagName;
     if (tg === 'INPUT' || tg === 'TEXTAREA' || tg === 'SELECT') return;
+    if (ev.target && ev.target.closest && ev.target.closest('#import-panel')) return;
     var action = Keys.mapKey(ev.key, screen);
     if (!action) return;
     ev.preventDefault();
