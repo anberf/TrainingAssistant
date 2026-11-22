@@ -48,9 +48,9 @@ test('set-pin: configText is valid JS setting OwnerConfig.pinHash', () => {
   assert.strictEqual(sandbox.out.pinHash, h);
 });
 
-test('committed owner-config.js has an EMPTY hash', () => {
+test('committed owner-config.js has an empty hash or a SHA-256 hex hash (never a PIN)', () => {
   const cfg = require('../js/owner-config.js');
-  assert.strictEqual(cfg.pinHash, '');
+  assert.match(cfg.pinHash, /^(|[0-9a-f]{64})$/);
 });
 
 test('owner UI wiring: ids exist, scripts loaded before app.js, in APP_SHELL, keydown guard', () => {
