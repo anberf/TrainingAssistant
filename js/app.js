@@ -279,8 +279,69 @@
   press($('btn-skip'), 'skip');
   $('btn-home').addEventListener('click', goHome);
 
+  // ---- Owner mode (SPEC 4b): hides edit controls only; not security (D40, D41) ----
+  var OWNER_KEY = 'kb-timer-owner';
+  var ownerOn = false;
+
+  function readOwner() {
+    var h = OwnerConfig.pinHash;
+    if (!h) return false;
+    try { return localStorage.getItem(OWNER_KEY) === h; } catch (e) { return false; }
+  }
+  function writeOwner(on) {
+    try {
+      if (on) localStorage.setItem(OWNER_KEY, OwnerConfig.pinHash);
+      else localStorage.removeItem(OWNER_KEY);
+    } catch (e) { /* storage unavailable */ }
+  }
+  function renderOwner() {
+    app.setAttribute('data-owner', ownerOn ? 'on' : 'off');
+    $('owner-btn').textContent = ownerOn ? 'Lock' : 'Owner';
+    if (ownerOn) $('owner-panel').hidden = true;
+  }
+  function closeOwnerPanel() {
+    $('owner-panel').hidden = true;
+    $('owner-pin').value = '';
+    $('owner-msg').textContent = '';
+  }
+  function tryUnlock() {
+    var pin = $('owner-pin').value;
+    $('owner-pin').value = '';
+    if (Owner.checkPin(pin, OwnerConfig.pinHash)) {
+      ownerOn = true; writeOwner(true);
+      $('owner-msg').textContent = '';
+      renderOwner();
+    } else {
+      $('owner-msg').textContent = 'Wrong PIN';
+    }
+  }
+  $('owner-btn').addEventListener('click', function () {
+    $('owner-btn').blur();
+    if (ownerOn) { ownerOn = false; writeOwner(false); closeOwnerPanel(); renderOwner(); return; }
+    var panel = $('owner-panel');
+    if (!panel.hidden) { closeOwnerPanel(); return; }
+    panel.hidden = false;
+    if (!OwnerConfig.pinHash) {
+      $('owner-msg').textContent = 'No PIN set';
+      $('owner-pin').disabled = true;
+      $('owner-unlock').disabled = true;
+    } else {
+      $('owner-msg').textContent = '';
+      $('owner-pin').focus();
+    }
+  });
+  $('owner-unlock').addEventListener('click', function () { $('owner-unlock').blur(); tryUnlock(); });
+  $('owner-cancel').addEventListener('click', function () { $('owner-cancel').blur(); closeOwnerPanel(); });
+  $('owner-pin').addEventListener('keydown', function (ev) {
+    if (ev.key === 'Enter') { ev.preventDefault(); tryUnlock(); }
+  });
+  ownerOn = readOwner();
+  renderOwner();
+
   document.addEventListener('keydown', function (ev) {
     if (ev.repeat) return;
+    var tg = ev.target && ev.target.tagName;
+    if (tg === 'INPUT' || tg === 'TEXTAREA' || tg === 'SELECT') return;
     var action = Keys.mapKey(ev.key, screen);
     if (!action) return;
     ev.preventDefault();

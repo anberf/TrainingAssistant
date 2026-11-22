@@ -26,6 +26,13 @@
       </div>
       <ul id="routine-list"></ul>
       <p id="app-version"></p>
+      <button id="owner-btn" type="button">Owner</button>
+      <div id="owner-panel" hidden>
+        <input id="owner-pin" type="password" inputmode="numeric" autocomplete="off" aria-label="Owner PIN">
+        <button id="owner-unlock" type="button">Unlock</button>
+        <button id="owner-cancel" type="button">Cancel</button>
+        <p id="owner-msg"></p>
+      </div>
     </section>
 
     <section id="screen-run" class="screen" hidden>
@@ -63,6 +70,8 @@
   <script src="js/app-info.js"></script>
   <script src="js/routine.js"></script>
   <script src="js/pace.js"></script>
+  <script src="js/owner.js"></script>
+  <script src="js/owner-config.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/keys.js"></script>
   <script src="js/view.js"></script>

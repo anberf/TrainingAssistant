@@ -62,7 +62,7 @@ AC:
 - All existing tests pass (APP_SHELL unchanged).
 
 ### T23 — Owner mode (PIN)
-Status: todo
+Status: done
 - User change 4 (D40, D41). SPEC §4b. Hides edit controls from everyone but the owner. NOT security: the real protection is that only the owner can push to GitHub.
 - New pure UMD module `js/owner.js` (global `Owner`; add to `index.html` before `app.js` and to `APP_SHELL`): `sha256Hex(str)` (pure JS, synchronous, UTF-8, no WebCrypto), `hashPin(pin)` = `sha256Hex('training-assistant:' + pin)`, `checkPin(pin, hash)` (false when hash is empty/invalid).
 - New `js/owner-config.js` (UMD, global `OwnerConfig = { pinHash: '' }`; in `index.html` + `APP_SHELL`). Empty hash = owner mode cannot be unlocked (panel shows "No PIN set").
