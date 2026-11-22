@@ -3,6 +3,7 @@
 Format: one line per task under `## Unreleased`: `- Txx: summary`. On release, rename to `## vN (date)` and bump `CACHE_VERSION` in `sw.js` to `vN`.
 
 ## Unreleased
+- T29: Publish refused unless routines/index.json loaded (Drafts.publishPlan, indexOk in app.js); Undo after Remove keeps imports and renames; Mark as published needs confirm === true.
 
 ## v10 (2026-11-22)
 - T28: release v10 (CACHE_VERSION + AppInfo.version v10).

@@ -135,7 +135,7 @@ AC:
 - Release tests pass with `v10`.
 
 ### T29 — Owner: safe publish + Undo keeps imports
-Status: todo
+Status: done
 - Found in T26/T27 review + browser check (D53). SPEC §4b.
 - Bug 1 (data loss for everyone): if `routines/index.json` did not load (offline and never cached, or a bad response), `baseEntries` is empty and Publish produces an `index.json` listing only the new files; uploading it hides every published routine.
   - New pure `Drafts.publishPlan(entries, drafts, indexOk)` → `{ files, error }`: when `indexOk` is not `true`, `files` = `[]` and `error` = `"Routine list not loaded. Open the app online, then publish."`; otherwise `files` = `publishFiles(entries, drafts)` and `error` = null. `publishFiles` unchanged.

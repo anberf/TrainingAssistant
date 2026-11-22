@@ -7,6 +7,7 @@
   var engine = null;
   var rafId = 0;
   var entries = [];   // displayed: { file, name, routine, ok, error, total, unpublished?, removed? }
+  var indexOk = false; // true only when routines/index.json loaded with a routines array
   var baseEntries = []; // as loaded from routines/ (no drafts)
   var selected = 0;
   var cache = {};
@@ -205,7 +206,9 @@
   }
 
   function loadRoutines() {
+    indexOk = false;
     return fetch('routines/index.json').then(function (r) { return r.json(); }).then(function (idx) {
+      indexOk = !!idx && typeof idx === 'object' && Array.isArray(idx.routines);
       var files = (idx && idx.routines) || [];
       return Promise.all(files.map(function (f) {
         return fetch('routines/' + f).then(function (r) { return r.json(); }).then(function (obj) {
@@ -220,6 +223,7 @@
       baseEntries = list;
       refresh();
     }).catch(function () {
+      indexOk = false;
       baseEntries = [];
       entries = [];
       renderPicker();
@@ -568,7 +572,9 @@
   function openPublish() {
     var ul = $('publish-files');
     ul.textContent = '';
-    Drafts.publishFiles(baseEntries, drafts).forEach(function (f) {
+    var plan = Drafts.publishPlan(baseEntries, drafts, indexOk);
+    $('publish-msg').textContent = plan.error || '';
+    plan.files.forEach(function (f) {
       var li = document.createElement('li');
       var b = document.createElement('button');
       b.type = 'button'; b.textContent = 'Download';
@@ -587,8 +593,8 @@
   $('publish-close').addEventListener('click', function () { $('publish-close').blur(); closePublish(); });
   $('publish-done').addEventListener('click', function () {
     $('publish-done').blur();
-    var ok = true;
-    try { ok = window.confirm('Clear all unpublished changes? Do this only after uploading the files to GitHub.'); } catch (e) { ok = true; }
+    var ok = false;
+    try { ok = window.confirm('Clear all unpublished changes? Do this only after uploading the files to GitHub.') === true; } catch (e) { ok = false; }
     if (!ok) return;
     saveDrafts(Drafts.normalize(null));
     closePublish();

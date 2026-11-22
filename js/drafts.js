@@ -57,8 +57,11 @@
 
   function undo(drafts, file) {
     var d = normalize(drafts);
-    delete d.routines[file];
-    d.removed = d.removed.filter(function (f) { return f !== file; });
+    if (d.removed.indexOf(file) !== -1) {
+      d.removed = d.removed.filter(function (f) { return f !== file; });
+    } else {
+      delete d.routines[file];
+    }
     return d;
   }
 
@@ -111,11 +114,17 @@
     return out;
   }
 
+  // Safe publish (T29): never produce an index.json unless routines/index.json really loaded.
+  function publishPlan(entries, drafts, indexOk) {
+    if (indexOk !== true) return { files: [], error: 'Routine list not loaded. Open the app online, then publish.' };
+    return { files: publishFiles(entries, drafts), error: null };
+  }
+
   // Number shown on the Publish button: draft routines + removals not already counted.
   function changeCount(drafts) {
     var d = normalize(drafts);
     return Object.keys(d.routines).length + d.removed.filter(function (f) { return !has(d.routines, f); }).length;
   }
 
-  return { publishFiles: publishFiles, changeCount: changeCount, normalize: normalize, rename: rename, add: add, remove: remove, undo: undo, apply: apply, isEmpty: isEmpty };
+  return { publishFiles: publishFiles, publishPlan: publishPlan, changeCount: changeCount, normalize: normalize, rename: rename, add: add, remove: remove, undo: undo, apply: apply, isEmpty: isEmpty };
 });

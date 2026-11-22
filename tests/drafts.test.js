@@ -35,7 +35,10 @@ test('remove + undo', () => {
   assert.deepStrictEqual(d.removed, ['a.json']);
   assert.ok(!Drafts.isEmpty(d));
   d = Drafts.rename(d, 'a.json', base, 'X').drafts;
-  d = Drafts.undo(d, 'a.json');
+  d = Drafts.undo(d, 'a.json'); // T29: un-removes only, keeps the rename
+  assert.deepStrictEqual(d.removed, []);
+  assert.strictEqual(d.routines['a.json'].name, 'X');
+  d = Drafts.undo(d, 'a.json'); // not removed -> discards the rename
   assert.ok(Drafts.isEmpty(d));
 });
 
@@ -166,4 +169,41 @@ test('UI: publish panel IDs used by app.js exist; keydown ignores the publish pa
   assert.ok(used.length >= 5);
   for (const id of used) assert.ok(ids.has(id), id);
   assert.match(app, /closest\('#publish-panel'\)/);
+});
+
+test('T29: publishPlan refuses without a loaded index', () => {
+  const entries = [{ file: 'a.json' }];
+  const d = Drafts.add(null, 'new.json', { name: 'N' });
+  for (const ok of [false, undefined, null, 'true', 1]) {
+    const p = Drafts.publishPlan(entries, d, ok);
+    assert.deepStrictEqual(p.files, []);
+    assert.strictEqual(p.error, 'Routine list not loaded. Open the app online, then publish.');
+  }
+  const p = Drafts.publishPlan(entries, d, true);
+  assert.strictEqual(p.error, null);
+  assert.deepStrictEqual(p.files, Drafts.publishFiles(entries, d));
+});
+
+test('T29: undo after remove keeps imports and renames', () => {
+  let d = Drafts.add(null, 'imp.json', { name: 'Imp' });
+  d = Drafts.undo(Drafts.remove(d, 'imp.json'), 'imp.json');
+  assert.deepStrictEqual(d.removed, []);
+  const a = Drafts.apply([], d);
+  assert.strictEqual(a.length, 1);
+  assert.strictEqual(a[0].unpublished, true);
+  assert.ok(!a[0].removed);
+  const base = [{ file: 'a.json', name: 'A', routine: { name: 'A' }, ok: true }];
+  let r = Drafts.rename(null, 'a.json', { name: 'A' }, 'B').drafts;
+  r = Drafts.undo(Drafts.remove(r, 'a.json'), 'a.json');
+  assert.strictEqual(r.routines['a.json'].name, 'B');
+  assert.strictEqual(Drafts.apply(base, r)[0].name, 'B');
+  const plain = Drafts.rename(null, 'a.json', { name: 'A' }, 'B').drafts;
+  assert.deepStrictEqual(Drafts.undo(plain, 'a.json'), Drafts.normalize(null));
+});
+
+test('T29: app.js uses publishPlan, not publishFiles; confirm must return true', () => {
+  const app = fs.readFileSync(path.join(root, 'js/app.js'), 'utf8');
+  assert.match(app, /Drafts\.publishPlan\(/);
+  assert.doesNotMatch(app, /Drafts\.publishFiles\(/);
+  assert.match(app, /=== true;/);
 });
